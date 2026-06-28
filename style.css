@@ -263,3 +263,69 @@ a {
     padding: 0.62rem 0.75rem;
   }
 }
+
+:root {
+  --left-color: #991408;
+  --right-color: #3a0ca3;
+}
+
+.left,
+.viewer-left {
+  background: var(--left-color);
+}
+
+.right,
+.viewer-right {
+  background: var(--right-color);
+}
+
+.scorekeeper[hidden] {
+  display: none;
+}
+
+.modal-card label {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.85rem;
+  color: rgba(255,255,255,0.84);
+  font-weight: 800;
+}
+
+.modal-card input[type="text"],
+.modal-card input:not([type]) {
+  width: 100%;
+}
+
+.modal-card input {
+  border: 0;
+  border-radius: 14px;
+  padding: 0.8rem;
+  color: #111;
+  font-weight: 800;
+}
+
+.modal-card input[type="color"] {
+  min-height: 3rem;
+  padding: 0.25rem;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(5rem + env(safe-area-inset-bottom));
+  transform: translateX(-50%) translateY(1rem);
+  opacity: 0;
+  pointer-events: none;
+  background: rgba(255,255,255,0.95);
+  color: #111;
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+  font-weight: 900;
+  z-index: 30;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

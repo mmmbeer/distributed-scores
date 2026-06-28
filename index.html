@@ -3,50 +3,65 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>VBall Scorekeeper</title>
+  <title>VBall Scores</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="viewer-mode">
-  <main class="scorekeeper">
+<body class="landing-mode">
+  <main class="scorekeeper" id="scoreboard" hidden>
     <section id="leftSide" class="side left">
-      <input id="leftTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Left team name">
+      <input id="leftTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Team name">
       <div id="leftTeamLabel" class="viewer-name embedded-viewer-name">Home</div>
       <div id="leftScore" class="score">0</div>
       <button id="leftGame" class="game-button scorekeeper-only" type="button">+ Game Won</button>
       <div class="games">Games: <span id="leftGames">0</span></div>
     </section>
-
     <section id="rightSide" class="side right">
-      <input id="rightTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Right team name">
+      <input id="rightTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Opponent name">
       <div id="rightTeamLabel" class="viewer-name embedded-viewer-name">Away</div>
       <div id="rightScore" class="score">0</div>
       <button id="rightGame" class="game-button scorekeeper-only" type="button">+ Game Won</button>
       <div class="games">Games: <span id="rightGames">0</span></div>
     </section>
-
     <div id="syncStatus" class="sync-status">Live sync</div>
-
     <nav class="controls scorekeeper-only">
+      <button id="shareGame" type="button">Share</button>
       <button id="newSet" type="button">New Game / Set</button>
       <button id="resetMatch" type="button">Reset Match 0-0</button>
-      <button id="chooseMode" type="button">Change Mode</button>
+      <button id="homeButton" type="button">Home</button>
     </nav>
-
-    <button id="viewerModeButton" class="viewer-mode-button viewer-only" type="button">Change Mode</button>
   </main>
 
-  <div id="modeModal" class="modal-backdrop">
-    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modeTitle">
-      <h1 id="modeTitle">Choose display mode</h1>
-      <p>Viewer mode is read-only and is the default. Scorekeeper mode lets this device change the score.</p>
-
+  <div id="homeModal" class="modal-backdrop">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="homeTitle">
+      <h1 id="homeTitle">Volleyball Scores</h1>
+      <p>Start a live game as the scorekeeper or join with a share key.</p>
       <div class="mode-actions">
-        <button id="startViewer" class="mode-primary" type="button">Viewer</button>
-        <button id="startScorekeeper" type="button">Scorekeeper</button>
+        <button id="chooseScorekeeper" class="mode-primary" type="button">Scorekeeper</button>
+        <button id="chooseViewer" type="button">Viewer</button>
       </div>
     </section>
   </div>
 
-  <script src="app.js"></script>
+  <div id="setupModal" class="modal-backdrop hidden">
+    <form id="setupForm" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+      <h1 id="setupTitle">New Game</h1>
+      <label>Team Name<input id="setupTeam" required maxlength="80" value="Home"></label>
+      <label>Team Color<input id="setupTeamColor" type="color" value="#991408"></label>
+      <label>Opponent<input id="setupOpponent" maxlength="80" placeholder="Away"></label>
+      <label>Opponent Color<input id="setupOpponentColor" type="color" value="#3a0ca3"></label>
+      <div class="mode-actions"><button class="mode-primary" type="submit">Create Game</button><button type="button" data-close>Back</button></div>
+    </form>
+  </div>
+
+  <div id="joinModal" class="modal-backdrop hidden">
+    <form id="joinForm" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
+      <h1 id="joinTitle">Join Game</h1>
+      <label>Share Key<input id="joinKey" required maxlength="5" minlength="5" autocomplete="off" placeholder="XXXXX"></label>
+      <div class="mode-actions"><button class="mode-primary" type="submit">Watch</button><button type="button" data-close>Back</button></div>
+    </form>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
