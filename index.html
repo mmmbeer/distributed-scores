@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>VBall Scores</title>
+  <title>Keep Score</title>
+  <link rel="icon" type="image/png" href="/keepscore.png">
+  <link rel="apple-touch-icon" href="/keepscore.png">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body class="landing-mode">
@@ -41,7 +43,8 @@
 
   <div id="homeModal" class="modal-backdrop hidden">
     <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="homeTitle">
-      <h1 id="homeTitle">Volleyball Scores</h1>
+      <img class="modal-logo" src="/keepscore.png" alt="Keep Score logo">
+      <h1 id="homeTitle">Keep Score</h1>
       <p>Start a live game as the scorekeeper or join with a share key.</p>
       <div class="mode-actions">
         <button id="chooseScorekeeper" class="mode-primary" type="button">Scorekeeper</button>
@@ -55,11 +58,31 @@
       <h1 id="setupTitle">New Game</h1>
       <div class="field-row">
         <label>Team Name<input id="setupTeam" required maxlength="80" value="Home"></label>
-        <label class="color-field">Team Color<input id="setupTeamColor" type="color" value="#991408"></label>
+        <label class="color-field">Color<input id="setupTeamColor" type="color" value="#991408" list="teamColorPresets"></label>
       </div>
       <div class="field-row">
         <label>Opponent<input id="setupOpponent" maxlength="80" placeholder="Opponent"></label>
-        <label class="color-field">Opponent Color<input id="setupOpponentColor" type="color" value="#3a0ca3"></label>
+        <label class="color-field">Color<input id="setupOpponentColor" type="color" value="#3a0ca3" list="teamColorPresets"></label>
+      </div>
+      <datalist id="teamColorPresets">
+        <option value="#991408">
+        <option value="#3a0ca3">
+        <option value="#0b5ed7">
+        <option value="#198754">
+        <option value="#fd7e14">
+        <option value="#6f42c1">
+        <option value="#111827">
+        <option value="#f7d046">
+      </datalist>
+      <div class="color-presets" aria-label="Team color presets">
+        <button type="button" data-color-preset="#991408" style="--preset-color: #991408" aria-label="Select red"></button>
+        <button type="button" data-color-preset="#3a0ca3" style="--preset-color: #3a0ca3" aria-label="Select purple"></button>
+        <button type="button" data-color-preset="#0b5ed7" style="--preset-color: #0b5ed7" aria-label="Select blue"></button>
+        <button type="button" data-color-preset="#198754" style="--preset-color: #198754" aria-label="Select green"></button>
+        <button type="button" data-color-preset="#fd7e14" style="--preset-color: #fd7e14" aria-label="Select orange"></button>
+        <button type="button" data-color-preset="#6f42c1" style="--preset-color: #6f42c1" aria-label="Select violet"></button>
+        <button type="button" data-color-preset="#111827" style="--preset-color: #111827" aria-label="Select black"></button>
+        <button type="button" data-color-preset="#f7d046" style="--preset-color: #f7d046" aria-label="Select gold"></button>
       </div>
       <div class="modal-actions"><button type="button" data-close>Back</button><button class="mode-primary" type="submit">Create Game</button></div>
     </form>
