@@ -79,7 +79,7 @@ function changeScore(side, amount) {
 async function shareGame() {
   const url = viewerUrl(game.gameId);
   if (navigator.share && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    await navigator.share({ title: "Volleyball score", url }).catch(() => {});
+    await navigator.share({ title: "Keep Score", url }).catch(() => {});
     return;
   }
   await navigator.clipboard.writeText(url);
@@ -131,7 +131,22 @@ function closeActiveModal() {
   goHome();
 }
 
+function bindColorPresets() {
+  let activeColorInput = $("setupTeamColor");
+  for (const input of [$("setupTeamColor"), $("setupOpponentColor")]) {
+    input.addEventListener("focus", () => { activeColorInput = input; });
+    input.addEventListener("click", () => { activeColorInput = input; });
+  }
+  document.querySelectorAll("[data-color-preset]").forEach(button => {
+    button.addEventListener("click", () => {
+      activeColorInput.value = button.dataset.colorPreset;
+      activeColorInput.focus();
+    });
+  });
+}
+
 function bindModals() {
+  bindColorPresets();
   $("chooseScorekeeper").addEventListener("click", () => { hide($("homeModal")); show($("setupModal")); });
   $("chooseViewer").addEventListener("click", () => { hide($("homeModal")); show($("joinModal")); $("joinKey").focus(); });
   document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => { hide($("setupModal")); hide($("joinModal")); show($("homeModal")); }));
