@@ -2,7 +2,7 @@ import { createGame, getGame, updateGame } from "./api.js";
 import { $, hide, show, toast } from "./dom.js";
 import { GamePoller } from "./poller.js";
 import { goHome, goScorekeeper, goViewer, route, viewerUrl } from "./routes.js";
-import { bindTeamEditing, bindTouchZone, isEditingTeamName, render } from "./scoreboard.js";
+import { bindGameTracker, bindTeamEditing, bindTouchZone, isEditingTeamName, render } from "./scoreboard.js";
 
 let game = null;
 let mode = "landing";
@@ -47,18 +47,17 @@ function bindControls() {
   bindTeamEditing(savePatch);
   bindTouchZone($("leftSide"), "left", changeScore);
   bindTouchZone($("rightSide"), "right", changeScore);
-  $("leftGame").addEventListener("click", e => addGameWin(e, "leftGames"));
-  $("rightGame").addEventListener("click", e => addGameWin(e, "rightGames"));
+  bindGameTracker($("leftGamesBar"), "leftGames", changeGames);
+  bindGameTracker($("rightGamesBar"), "rightGames", changeGames);
   $("newSet").addEventListener("click", () => savePatch({ leftScore: 0, rightScore: 0, setNumber: game.setNumber + 1 }));
   $("resetMatch").addEventListener("click", () => savePatch({ leftScore: 0, rightScore: 0, leftGames: 0, rightGames: 0, setNumber: 1 }));
   $("shareGame").addEventListener("click", shareGame);
   $("homeButton").addEventListener("click", goHome);
 }
 
-function addGameWin(event, key) {
-  event.stopPropagation();
+function changeGames(key, amount) {
   if (!game || mode !== "scorekeeper") return;
-  savePatch({ [key]: Number(game[key]) + 1 });
+  savePatch({ [key]: Math.max(0, Number(game[key]) + amount) });
 }
 
 function changeScore(side, amount) {

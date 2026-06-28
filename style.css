@@ -392,3 +392,105 @@ a {
     --team-name-min-size: 18;
   }
 }
+
+.scorekeeper-mode .side,
+.viewer-mode .side {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  justify-items: center;
+  align-items: stretch;
+  padding: calc(0.75rem + env(safe-area-inset-top)) 0 calc(0.75rem + env(safe-area-inset-bottom));
+}
+
+.team-header {
+  align-self: start;
+  display: grid;
+  min-height: clamp(4.5rem, 14dvh, 7.5rem);
+  place-items: center;
+  width: 100%;
+  padding: 0.75rem clamp(0.5rem, 2vw, 1.25rem);
+}
+
+.scorekeeper-mode .team-input {
+  width: min(100%, 34rem);
+  margin: 0;
+}
+
+.scorekeeper-mode .score,
+.viewer-mode .score {
+  align-self: center;
+  justify-self: center;
+  margin: 0;
+}
+
+.scorekeeper-mode .games,
+.viewer-mode .games {
+  align-self: end;
+  justify-self: stretch;
+  margin: 0;
+  min-height: clamp(3.4rem, 10dvh, 5.5rem);
+  display: grid;
+  place-items: center;
+  padding: 0.55rem 1rem calc(0.55rem + env(safe-area-inset-bottom));
+  text-align: center;
+  touch-action: pan-x;
+}
+
+.left .game-tracker {
+  background: color-mix(in srgb, var(--left-color), white 14%);
+}
+
+.right .game-tracker {
+  background: color-mix(in srgb, var(--right-color), black 14%);
+}
+
+.chrome-button,
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0;
+  border-radius: 999px;
+  z-index: 10;
+}
+
+.chrome-button svg,
+.icon-button svg {
+  width: 1.55rem;
+  height: 1.55rem;
+  fill: currentColor;
+}
+
+.top-left,
+.top-right {
+  position: fixed;
+  top: calc(0.75rem + env(safe-area-inset-top));
+}
+
+.top-left {
+  left: 0.75rem;
+}
+
+.top-right {
+  right: 0.75rem;
+}
+
+.controls {
+  width: auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.modal-actions button {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+}

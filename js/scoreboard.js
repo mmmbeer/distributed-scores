@@ -35,7 +35,7 @@ export function bindTouchZone(element, side, onScore) {
   let startY = 0;
   let startedOnControl = false;
   element.addEventListener("pointerdown", event => {
-    startedOnControl = Boolean(event.target.closest("button, input, a"));
+    startedOnControl = Boolean(event.target.closest("button, input, a, .game-tracker"));
     startX = event.clientX;
     startY = event.clientY;
   });
@@ -44,6 +44,19 @@ export function bindTouchZone(element, side, onScore) {
     const dx = event.clientX - startX;
     const dy = event.clientY - startY;
     onScore(side, Math.abs(dy) > 48 && Math.abs(dy) > Math.abs(dx) && dy > 0 ? -1 : 1);
+  });
+}
+
+export function bindGameTracker(element, key, onChange) {
+  let startX = 0;
+  element.addEventListener("pointerdown", event => {
+    startX = event.clientX;
+  });
+  element.addEventListener("pointerup", event => {
+    event.stopPropagation();
+    const dx = event.clientX - startX;
+    if (Math.abs(dx) < 32) return;
+    onChange(key, dx > 0 ? 1 : -1);
   });
 }
 

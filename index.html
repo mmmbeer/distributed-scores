@@ -8,26 +8,38 @@
 </head>
 <body class="landing-mode">
   <main class="scorekeeper" id="scoreboard" hidden>
+    <button id="homeButton" class="chrome-button top-left" type="button" aria-label="Home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5v8a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-8Z"/></svg>
+    </button>
+    <button id="shareGame" class="chrome-button top-right scorekeeper-only" type="button" aria-label="Share viewer link">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.76 0-1.44.3-1.96.77L8.91 12.7a3.3 3.3 0 0 0 0-1.39l7.05-4.12A3 3 0 1 0 15 5c0 .23.03.45.08.66L8.03 9.78a3 3 0 1 0 0 4.44l7.12 4.18c-.04.19-.06.39-.06.6a3 3 0 1 0 3-2.9Z"/></svg>
+    </button>
+
     <section id="leftSide" class="side left">
-      <input id="leftTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Team name">
-      <div id="leftTeamLabel" class="viewer-name embedded-viewer-name">Home</div>
+      <header class="team-header">
+        <input id="leftTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Team name">
+        <div id="leftTeamLabel" class="viewer-name embedded-viewer-name">Home</div>
+      </header>
       <div id="leftScore" class="score">0</div>
-      <button id="leftGame" class="game-button scorekeeper-only" type="button">+ Game Won</button>
-      <div class="games">Games: <span id="leftGames">0</span></div>
+      <footer id="leftGamesBar" class="games game-tracker" aria-label="Team games won">Games: <span id="leftGames">0</span></footer>
     </section>
     <section id="rightSide" class="side right">
-      <input id="rightTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Opponent name">
-      <div id="rightTeamLabel" class="viewer-name embedded-viewer-name">Opponent</div>
+      <header class="team-header">
+        <input id="rightTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Opponent name">
+        <div id="rightTeamLabel" class="viewer-name embedded-viewer-name">Opponent</div>
+      </header>
       <div id="rightScore" class="score">0</div>
-      <button id="rightGame" class="game-button scorekeeper-only" type="button">+ Game Won</button>
-      <div class="games">Games: <span id="rightGames">0</span></div>
+      <footer id="rightGamesBar" class="games game-tracker" aria-label="Opponent games won">Games: <span id="rightGames">0</span></footer>
     </section>
+
     <div id="syncStatus" class="sync-status">Live sync</div>
-    <nav class="controls scorekeeper-only">
-      <button id="shareGame" type="button">Share</button>
-      <button id="newSet" type="button">New Game / Set</button>
-      <button id="resetMatch" type="button">Reset Match 0-0</button>
-      <button id="homeButton" type="button">Home</button>
+    <nav class="controls scorekeeper-only" aria-label="Scorekeeper controls">
+      <button id="newSet" class="icon-button" type="button" aria-label="New game or set">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5Z"/></svg>
+      </button>
+      <button id="resetMatch" class="icon-button" type="button" aria-label="Reset match">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a7 7 0 1 1-6.32 4H3.5A9 9 0 1 0 12 3v2Zm-7-1v6h6V8H8.41A6.97 6.97 0 0 1 12 5V3a8.96 8.96 0 0 0-5.66 2H5Z"/></svg>
+      </button>
     </nav>
   </main>
 
@@ -53,7 +65,7 @@
         <label>Opponent<input id="setupOpponent" maxlength="80" placeholder="Opponent"></label>
         <label class="color-field">Opponent Color<input id="setupOpponentColor" type="color" value="#3a0ca3"></label>
       </div>
-      <div class="mode-actions"><button class="mode-primary" type="submit">Create Game</button><button type="button" data-close>Back</button></div>
+      <div class="modal-actions"><button type="button" data-close>Back</button><button class="mode-primary" type="submit">Create Game</button></div>
     </form>
   </div>
 
@@ -61,7 +73,7 @@
     <form id="joinForm" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
       <h1 id="joinTitle">Join Game</h1>
       <label>Share Key<input id="joinKey" required maxlength="5" minlength="5" autocomplete="off" placeholder="XXXXX"></label>
-      <div class="mode-actions"><button class="mode-primary" type="submit">Watch</button><button type="button" data-close>Back</button></div>
+      <div class="modal-actions"><button type="button" data-close>Back</button><button class="mode-primary" type="submit">Watch</button></div>
     </form>
   </div>
 
