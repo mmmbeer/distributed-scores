@@ -17,7 +17,7 @@ try {
     $stmt->execute([
       $id,
       clean_text($input['leftTeam'] ?? '', 'Home'),
-      clean_text($input['rightTeam'] ?? '', 'Away'),
+      clean_text($input['rightTeam'] ?? '', 'Opponent'),
       clean_color($input['leftColor'] ?? '', '#991408'),
       clean_color($input['rightColor'] ?? '', '#3a0ca3'),
     ]);
@@ -43,7 +43,7 @@ try {
     if (!find_game($pdo, $gameId)) json_response(['error' => 'Game not found'], 404);
     $next = [
       'leftTeam' => clean_text($input['leftTeam'] ?? 'Home', 'Home'),
-      'rightTeam' => clean_text($input['rightTeam'] ?? 'Away', 'Away'),
+      'rightTeam' => clean_text($input['rightTeam'] ?? 'Opponent', 'Opponent'),
       'leftColor' => clean_color($input['leftColor'] ?? '#991408', '#991408'),
       'rightColor' => clean_color($input['rightColor'] ?? '#3a0ca3', '#3a0ca3'),
       'leftScore' => max(0, (int)($input['leftScore'] ?? 0)),

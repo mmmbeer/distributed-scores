@@ -106,7 +106,7 @@ async function createFromForm(event) {
   const created = await createGame({
     leftTeam: $("setupTeam").value,
     leftColor: $("setupTeamColor").value,
-    rightTeam: $("setupOpponent").value || "Away",
+    rightTeam: $("setupOpponent").value || "Opponent",
     rightColor: $("setupOpponentColor").value
   });
   goScorekeeper(created.gameId);

@@ -17,7 +17,7 @@
     </section>
     <section id="rightSide" class="side right">
       <input id="rightTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Opponent name">
-      <div id="rightTeamLabel" class="viewer-name embedded-viewer-name">Away</div>
+      <div id="rightTeamLabel" class="viewer-name embedded-viewer-name">Opponent</div>
       <div id="rightScore" class="score">0</div>
       <button id="rightGame" class="game-button scorekeeper-only" type="button">+ Game Won</button>
       <div class="games">Games: <span id="rightGames">0</span></div>
@@ -45,10 +45,14 @@
   <div id="setupModal" class="modal-backdrop hidden">
     <form id="setupForm" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
       <h1 id="setupTitle">New Game</h1>
-      <label>Team Name<input id="setupTeam" required maxlength="80" value="Home"></label>
-      <label>Team Color<input id="setupTeamColor" type="color" value="#991408"></label>
-      <label>Opponent<input id="setupOpponent" maxlength="80" placeholder="Away"></label>
-      <label>Opponent Color<input id="setupOpponentColor" type="color" value="#3a0ca3"></label>
+      <div class="field-row">
+        <label>Team Name<input id="setupTeam" required maxlength="80" value="Home"></label>
+        <label class="color-field">Team Color<input id="setupTeamColor" type="color" value="#991408"></label>
+      </div>
+      <div class="field-row">
+        <label>Opponent<input id="setupOpponent" maxlength="80" placeholder="Opponent"></label>
+        <label class="color-field">Opponent Color<input id="setupOpponentColor" type="color" value="#3a0ca3"></label>
+      </div>
       <div class="mode-actions"><button class="mode-primary" type="submit">Create Game</button><button type="button" data-close>Back</button></div>
     </form>
   </div>

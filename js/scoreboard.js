@@ -26,7 +26,7 @@ export function bindTeamEditing(onChange) {
     $(id).addEventListener("blur", () => { editingTeamName = false; });
   }
   $("leftTeam").addEventListener("change", e => onChange({ leftTeam: e.target.value || "Home" }));
-  $("rightTeam").addEventListener("change", e => onChange({ rightTeam: e.target.value || "Away" }));
+  $("rightTeam").addEventListener("change", e => onChange({ rightTeam: e.target.value || "Opponent" }));
 }
 
 export function bindTouchZone(element, side, onScore) {
