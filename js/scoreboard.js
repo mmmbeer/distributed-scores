@@ -12,8 +12,11 @@ export function render(game) {
   $("rightTeamLabel").textContent = game.rightTeam;
   $("leftScore").textContent = game.leftScore;
   $("rightScore").textContent = game.rightScore;
+  const totalGames = Number(game.leftGames) + Number(game.rightGames);
   $("leftGames").textContent = game.leftGames;
   $("rightGames").textContent = game.rightGames;
+  $("leftGamesTotal").textContent = totalGames;
+  $("rightGamesTotal").textContent = totalGames;
   fitViewerTeamNames();
 }
 
