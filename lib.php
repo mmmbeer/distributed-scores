@@ -25,6 +25,7 @@ function db(): PDO {
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
   ]);
   ensure_schema($pdo);
+  purge_old_games($pdo);
   return $pdo;
 }
 
@@ -44,6 +45,19 @@ function ensure_schema(PDO $pdo): void {
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+  try {
+    $pdo->exec("CREATE EVENT IF NOT EXISTS purge_old_games
+      ON SCHEDULE EVERY 1 HOUR
+      DO DELETE FROM games WHERE updated_at < (CURRENT_TIMESTAMP - INTERVAL 1 DAY)");
+  } catch (Throwable $e) {
+    error_log('Unable to create purge_old_games event: ' . $e->getMessage());
+  }
+}
+
+function purge_old_games(PDO $pdo): void {
+  $stmt = $pdo->prepare('DELETE FROM games WHERE updated_at < (CURRENT_TIMESTAMP - INTERVAL 1 DAY)');
+  $stmt->execute();
 }
 
 function json_response(array $payload, int $status = 200): void {

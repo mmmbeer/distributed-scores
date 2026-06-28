@@ -494,3 +494,15 @@ a {
   padding: 1rem;
   font-size: 1.1rem;
 }
+
+.text-button {
+  min-width: 8.5rem;
+  height: 3.25rem;
+  padding: 0 1.15rem;
+  z-index: 10;
+}
+
+.danger-button {
+  background: #fee2e2;
+  color: #8a1111;
+}

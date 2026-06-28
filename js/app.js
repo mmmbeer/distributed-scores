@@ -49,8 +49,18 @@ function bindControls() {
   bindTouchZone($("rightSide"), "right", changeScore);
   bindGameTracker($("leftGamesBar"), "leftGames", changeGames);
   bindGameTracker($("rightGamesBar"), "rightGames", changeGames);
-  $("newSet").addEventListener("click", () => savePatch({ leftScore: 0, rightScore: 0, setNumber: game.setNumber + 1 }));
-  $("resetMatch").addEventListener("click", () => savePatch({ leftScore: 0, rightScore: 0, leftGames: 0, rightGames: 0, setNumber: 1 }));
+  $("newSet").addEventListener("click", () => confirmAction({
+    title: "Start new match?",
+    message: "This will clear the current scores and advance the match count.",
+    confirmLabel: "Start New Match",
+    onConfirm: () => savePatch({ leftScore: 0, rightScore: 0, setNumber: game.setNumber + 1 })
+  }));
+  $("resetMatch").addEventListener("click", () => confirmAction({
+    title: "Reset score?",
+    message: "This will clear scores, games won, and return the match count to 1.",
+    confirmLabel: "Reset Score",
+    onConfirm: () => savePatch({ leftScore: 0, rightScore: 0, leftGames: 0, rightGames: 0, setNumber: 1 })
+  }));
   $("shareGame").addEventListener("click", shareGame);
   $("homeButton").addEventListener("click", goHome);
 }
@@ -90,11 +100,42 @@ async function startGame(id, nextMode) {
   poller.start(game.version);
 }
 
+function confirmAction({ title, message, confirmLabel, onConfirm }) {
+  $("confirmTitle").textContent = title;
+  $("confirmMessage").textContent = message;
+  $("confirmAccept").textContent = confirmLabel;
+  show($("confirmModal"));
+  $("confirmAccept").focus();
+  const cleanup = () => {
+    $("confirmAccept").removeEventListener("click", accept);
+    $("confirmCancel").removeEventListener("click", cancel);
+  };
+  const close = () => {
+    cleanup();
+    hide($("confirmModal"));
+  };
+  const accept = () => {
+    close();
+    onConfirm();
+  };
+  const cancel = () => close();
+  $("confirmAccept").addEventListener("click", accept);
+  $("confirmCancel").addEventListener("click", cancel);
+}
+
+function closeActiveModal() {
+  if (!$("confirmModal").classList.contains("hidden")) {
+    $("confirmCancel").click();
+    return;
+  }
+  goHome();
+}
+
 function bindModals() {
   $("chooseScorekeeper").addEventListener("click", () => { hide($("homeModal")); show($("setupModal")); });
   $("chooseViewer").addEventListener("click", () => { hide($("homeModal")); show($("joinModal")); $("joinKey").focus(); });
   document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => { hide($("setupModal")); hide($("joinModal")); show($("homeModal")); }));
-  document.addEventListener("keydown", event => { if (event.key === "Escape") goHome(); });
+  document.addEventListener("keydown", event => { if (event.key === "Escape") closeActiveModal(); });
   $("setupForm").addEventListener("submit", createFromForm);
   $("joinForm").addEventListener("submit", event => { event.preventDefault(); goViewer($("joinKey").value.trim().toUpperCase()); });
 }
