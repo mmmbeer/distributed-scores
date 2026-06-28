@@ -14,6 +14,7 @@ export function render(game) {
   $("rightScore").textContent = game.rightScore;
   $("leftGames").textContent = game.leftGames;
   $("rightGames").textContent = game.rightGames;
+  fitViewerTeamNames();
 }
 
 export function isEditingTeamName() {
@@ -45,3 +46,21 @@ export function bindTouchZone(element, side, onScore) {
     onScore(side, Math.abs(dy) > 48 && Math.abs(dy) > Math.abs(dx) && dy > 0 ? -1 : 1);
   });
 }
+
+function fitViewerTeamNames() {
+  window.requestAnimationFrame(() => {
+    for (const id of ["leftTeamLabel", "rightTeamLabel"]) fitTextToWidth($(id));
+  });
+}
+
+function fitTextToWidth(element) {
+  if (!element || element.offsetParent === null) return;
+  const max = Number(getComputedStyle(element).getPropertyValue("--team-name-max-size")) || 96;
+  const min = Number(getComputedStyle(element).getPropertyValue("--team-name-min-size")) || 24;
+  element.style.fontSize = `${max}px`;
+  while (element.scrollWidth > element.clientWidth && parseFloat(element.style.fontSize) > min) {
+    element.style.fontSize = `${parseFloat(element.style.fontSize) - 2}px`;
+  }
+}
+
+window.addEventListener("resize", fitViewerTeamNames);

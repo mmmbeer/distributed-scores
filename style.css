@@ -350,3 +350,45 @@ a {
     grid-template-columns: minmax(0, 1fr) 6rem;
   }
 }
+
+.viewer-mode .side {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  justify-items: center;
+  align-items: center;
+  padding: calc(1rem + env(safe-area-inset-top)) 1rem calc(1rem + env(safe-area-inset-bottom));
+}
+
+.viewer-mode .embedded-viewer-name {
+  --team-name-max-size: 96;
+  --team-name-min-size: 24;
+  align-self: start;
+  display: block;
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  text-wrap: balance;
+  white-space: nowrap;
+}
+
+.viewer-mode .score {
+  align-self: center;
+  justify-self: center;
+  margin: 0;
+}
+
+.viewer-mode .games {
+  align-self: end;
+  justify-self: center;
+  margin: 0;
+  padding-bottom: 0.25rem;
+  text-align: center;
+}
+
+@media (max-width: 680px) {
+  .viewer-mode .embedded-viewer-name {
+    --team-name-max-size: 72;
+    --team-name-min-size: 18;
+  }
+}
