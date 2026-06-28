@@ -429,11 +429,14 @@ a {
   justify-self: stretch;
   margin: 0;
   min-height: clamp(3.4rem, 10dvh, 5.5rem);
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18em;
   padding: 0.55rem 1rem calc(0.55rem + env(safe-area-inset-bottom));
   text-align: center;
   touch-action: pan-x;
+  white-space: nowrap;
 }
 
 .left .game-tracker {
