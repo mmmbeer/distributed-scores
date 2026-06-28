@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VBall Viewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="viewer">
+    <section class="viewer-team viewer-left">
+      <div id="vLeftTeam" class="viewer-name">Home</div>
+      <div id="vLeftScore" class="viewer-score">0</div>
+      <div class="viewer-games">Games: <span id="vLeftGames">0</span></div>
+    </section>
+
+    <section class="viewer-team viewer-right">
+      <div id="vRightTeam" class="viewer-name">Away</div>
+      <div id="vRightScore" class="viewer-score">0</div>
+      <div class="viewer-games">Games: <span id="vRightGames">0</span></div>
+    </section>
+
+    <div class="set-label">Set <span id="vSetNumber">1</span></div>
+    <div id="connectionStatus" class="connection-status">Live</div>
+  </main>
+
+  <script src="viewer.js"></script>
+</body>
+</html>

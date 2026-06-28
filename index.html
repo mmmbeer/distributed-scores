@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VBall Scorekeeper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="viewer-mode">
+  <main class="scorekeeper">
+    <section id="leftSide" class="side left">
+      <input id="leftTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Left team name">
+      <div id="leftTeamLabel" class="viewer-name embedded-viewer-name">Home</div>
+      <div id="leftScore" class="score">0</div>
+      <button id="leftGame" class="game-button scorekeeper-only" type="button">+ Game Won</button>
+      <div class="games">Games: <span id="leftGames">0</span></div>
+    </section>
+
+    <section id="rightSide" class="side right">
+      <input id="rightTeam" class="team-input scorekeeper-only" autocomplete="off" aria-label="Right team name">
+      <div id="rightTeamLabel" class="viewer-name embedded-viewer-name">Away</div>
+      <div id="rightScore" class="score">0</div>
+      <button id="rightGame" class="game-button scorekeeper-only" type="button">+ Game Won</button>
+      <div class="games">Games: <span id="rightGames">0</span></div>
+    </section>
+
+    <div id="syncStatus" class="sync-status">Live sync</div>
+
+    <nav class="controls scorekeeper-only">
+      <button id="newSet" type="button">New Game / Set</button>
+      <button id="resetMatch" type="button">Reset Match 0-0</button>
+      <button id="chooseMode" type="button">Change Mode</button>
+    </nav>
+
+    <button id="viewerModeButton" class="viewer-mode-button viewer-only" type="button">Change Mode</button>
+  </main>
+
+  <div id="modeModal" class="modal-backdrop">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modeTitle">
+      <h1 id="modeTitle">Choose display mode</h1>
+      <p>Viewer mode is read-only and is the default. Scorekeeper mode lets this device change the score.</p>
+
+      <div class="mode-actions">
+        <button id="startViewer" class="mode-primary" type="button">Viewer</button>
+        <button id="startScorekeeper" type="button">Scorekeeper</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

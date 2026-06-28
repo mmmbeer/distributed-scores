@@ -1,0 +1,265 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #101114;
+  color: white;
+  overscroll-behavior: none;
+}
+
+button,
+a,
+input {
+  font: inherit;
+}
+
+.scorekeeper {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  user-select: none;
+  padding: 1rem;
+}
+
+.left,
+.viewer-left {
+  background: #991408;
+}
+
+.right,
+.viewer-right {
+  background: #3a0ca3;
+}
+
+.team-input {
+  width: min(90%, 340px);
+  font-size: clamp(1.1rem, 5vw, 2rem);
+  text-align: center;
+  padding: 0.65rem 0.8rem;
+  border: 0;
+  border-radius: 14px;
+  margin-bottom: 1rem;
+  color: #111;
+  font-weight: 800;
+}
+
+.embedded-viewer-name {
+  display: none;
+}
+
+.score {
+  font-size: clamp(7rem, 31vw, 20rem);
+  font-weight: 950;
+  line-height: 0.9;
+}
+
+.games {
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  margin-top: 0.75rem;
+  font-weight: 700;
+}
+
+.game-button {
+  margin-top: 0.7rem;
+}
+
+button,
+a {
+  padding: 0.72rem 1rem;
+  border-radius: 999px;
+  border: 0;
+  background: white;
+  color: #111;
+  text-decoration: none;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+}
+
+.controls {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: min(96%, 760px);
+  pointer-events: auto;
+}
+
+.viewer-mode .scorekeeper-only {
+  display: none;
+}
+
+.viewer-mode .embedded-viewer-name {
+  display: block;
+}
+
+.scorekeeper-mode .viewer-only {
+  display: none;
+}
+
+.viewer-mode .score {
+  font-size: clamp(9rem, 34vw, 26rem);
+}
+
+.viewer-mode .games {
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+}
+
+.viewer-mode-button {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  opacity: 0.75;
+}
+
+.viewer {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  text-align: center;
+}
+
+.viewer-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewer-name {
+  width: 90%;
+  text-overflow: ellipsis;
+  font-size: clamp(2rem, 8vw, 7rem);
+  font-weight: 950;
+  line-height: 1;
+}
+
+.viewer-score {
+  font-size: clamp(9rem, 34vw, 26rem);
+  font-weight: 1000;
+  line-height: 0.9;
+}
+
+.viewer-games {
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  font-weight: 800;
+}
+
+.set-label,
+.connection-status,
+.sync-status {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.45);
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  font-weight: 850;
+  backdrop-filter: blur(6px);
+}
+
+.set-label,
+.sync-status {
+  top: calc(1rem + env(safe-area-inset-top));
+}
+
+.connection-status {
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.sync-status {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.sync-status.changed {
+  background: rgba(255,255,255,0.9);
+  color: #111;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0,0,0,0.66);
+  z-index: 20;
+}
+
+.modal-backdrop.hidden {
+  display: none;
+}
+
+.modal-card {
+  width: min(92vw, 440px);
+  color: white;
+  background: #181b24;
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 24px;
+  box-shadow: 0 22px 70px rgba(0,0,0,0.45);
+  padding: 1.35rem;
+}
+
+.modal-card h1 {
+  margin: 0 0 0.6rem;
+  font-size: 1.6rem;
+}
+
+.modal-card p {
+  margin: 0 0 1.25rem;
+  color: rgba(255,255,255,0.78);
+  line-height: 1.4;
+}
+
+.mode-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.mode-actions button {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+}
+
+.mode-primary {
+  background: #f7d046;
+}
+
+@media (orientation: landscape) and (min-width: 700px) {
+  .mode-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (orientation: portrait) {
+  .controls {
+    font-size: 0.9rem;
+  }
+
+  button,
+  a {
+    padding: 0.62rem 0.75rem;
+  }
+}
