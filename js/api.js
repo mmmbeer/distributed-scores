@@ -1,4 +1,4 @@
-const api = "api.php";
+const api = "/api.php";
 
 async function request(url, options = {}) {
   const res = await fetch(url, { cache: "no-store", ...options });
