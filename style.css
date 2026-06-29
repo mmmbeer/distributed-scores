@@ -83,9 +83,10 @@ input {
 }
 
 .games {
-  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  font-size: clamp(0.95rem, 3vw, 1.35rem);
   margin-top: 0.75rem;
   font-weight: 700;
+  line-height: 1;
 }
 
 .game-button {
@@ -107,7 +108,7 @@ a {
 .controls {
   position: fixed;
   left: 50%;
-  bottom: calc(1rem + env(safe-area-inset-bottom));
+  bottom: calc(var(--games-bar-height) + 0.75rem + env(safe-area-inset-bottom));
   transform: translateX(-50%);
   display: flex;
   gap: 0.55rem;
@@ -134,7 +135,7 @@ a {
 }
 
 .viewer-mode .games {
-  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  font-size: clamp(1rem, 3vw, 1.55rem);
 }
 
 .viewer-mode-button {
@@ -241,6 +242,30 @@ a {
   font-size: 1.6rem;
 }
 
+.modal-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.modal-heading h1 {
+  margin: 0;
+}
+
+.link-button {
+  flex: 0 0 auto;
+  padding: 0.25rem 0;
+  background: transparent;
+  color: #f7d046;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
 .modal-logo {
   display: block;
   width: min(12rem, 52%);
@@ -292,6 +317,7 @@ a {
 :root {
   --left-color: #991408;
   --right-color: #3a0ca3;
+  --games-bar-height: clamp(2.25rem, 6dvh, 3.25rem);
 }
 
 .left,
@@ -466,7 +492,7 @@ a {
   grid-template-rows: auto minmax(0, 1fr) auto;
   justify-items: center;
   align-items: stretch;
-  padding: calc(0.75rem + env(safe-area-inset-top)) 0 calc(0.75rem + env(safe-area-inset-bottom));
+  padding: calc(0.75rem + env(safe-area-inset-top)) 0 0;
 }
 
 .team-header {
@@ -495,12 +521,12 @@ a {
   align-self: end;
   justify-self: stretch;
   margin: 0;
-  min-height: clamp(3.4rem, 10dvh, 5.5rem);
+  min-height: var(--games-bar-height);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.18em;
-  padding: 0.55rem 1rem calc(0.55rem + env(safe-area-inset-bottom));
+  padding: 0.35rem 0.75rem calc(0.35rem + env(safe-area-inset-bottom));
   text-align: center;
   touch-action: pan-x;
   white-space: nowrap;
@@ -546,9 +572,9 @@ a {
   right: 0.75rem;
 }
 
+
 .controls {
   width: auto;
-  flex-direction: column;
   align-items: center;
   gap: 0.65rem;
 }
