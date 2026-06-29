@@ -25,6 +25,7 @@ function showBoard(nextMode) {
   hide($("homeModal"));
   hide($("setupModal"));
   hide($("joinModal"));
+  hide($("continueModal"));
   stopScorekeeperTutorial();
 }
 
@@ -97,7 +98,22 @@ function bindControls() {
     onConfirm: () => savePatch({ leftScore: 0, rightScore: 0, leftGames: 0, rightGames: 0, setNumber: 1 })
   }));
   $("shareGame").addEventListener("click", shareGame);
+  $("swapSides").addEventListener("click", swapSides);
   $("homeButton").addEventListener("click", goHome);
+}
+
+function swapSides() {
+  if (!game || mode !== "scorekeeper") return;
+  savePatch({
+    leftTeam: game.rightTeam,
+    rightTeam: game.leftTeam,
+    leftColor: game.rightColor,
+    rightColor: game.leftColor,
+    leftScore: game.rightScore,
+    rightScore: game.leftScore,
+    leftGames: game.rightGames,
+    rightGames: game.leftGames
+  });
 }
 
 function buildNewMatchPatch(currentGame) {
@@ -223,10 +239,25 @@ function bindModals() {
   $("chooseScorekeeper").addEventListener("click", () => { hide($("homeModal")); show($("setupModal")); });
   $("chooseViewer").addEventListener("click", () => { hide($("homeModal")); show($("joinModal")); $("joinKey").focus(); });
   bindScorekeeperTutorial();
-  document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => { hide($("setupModal")); hide($("joinModal")); show($("homeModal")); }));
+  $("continueExistingGame").addEventListener("click", () => { hide($("setupModal")); show($("continueModal")); $("continueKey").focus(); });
+  document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => { hide($("setupModal")); hide($("joinModal")); hide($("continueModal")); show($("homeModal")); }));
   document.addEventListener("keydown", event => { if (event.key === "Escape") closeActiveModal(); });
   $("setupForm").addEventListener("submit", createFromForm);
   $("joinForm").addEventListener("submit", event => { event.preventDefault(); goViewer($("joinKey").value.trim().toUpperCase()); });
+  $("continueForm").addEventListener("submit", continueScorekeeping);
+}
+
+async function continueScorekeeping(event) {
+  event.preventDefault();
+  const gameId = $("continueKey").value.trim().toUpperCase();
+  await requestMobileFullscreen();
+  setStatus("Loading...");
+  try {
+    await startGame(gameId, "scorekeeper");
+    goScorekeeper(gameId);
+  } catch (error) {
+    toast(error.message || "Unable to load game");
+  }
 }
 
 async function createFromForm(event) {

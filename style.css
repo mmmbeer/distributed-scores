@@ -241,6 +241,30 @@ a {
   font-size: 1.6rem;
 }
 
+.modal-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.modal-heading h1 {
+  margin: 0;
+}
+
+.link-button {
+  flex: 0 0 auto;
+  padding: 0.25rem 0;
+  background: transparent;
+  color: #f7d046;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
 .modal-logo {
   display: block;
   width: min(12rem, 52%);
@@ -544,6 +568,15 @@ a {
 
 .top-right {
   right: 0.75rem;
+}
+
+.chrome-actions {
+  display: flex;
+  gap: 0.55rem;
+}
+
+.chrome-actions .chrome-button {
+  position: static;
 }
 
 .controls {
