@@ -86,9 +86,9 @@ function bindControls() {
   bindGameTracker($("rightGamesBar"), "rightGames", changeGames);
   $("newSet").addEventListener("click", () => confirmAction({
     title: "Start new match?",
-    message: "This will clear the current scores and advance the match count.",
+    message: "This will award the current game to the leading team, clear the scores, and advance the match count.",
     confirmLabel: "Start New Match",
-    onConfirm: () => savePatch({ leftScore: 0, rightScore: 0, setNumber: game.setNumber + 1 })
+    onConfirm: () => savePatch(buildNewMatchPatch(game))
   }));
   $("resetMatch").addEventListener("click", () => confirmAction({
     title: "Reset score?",
@@ -98,6 +98,21 @@ function bindControls() {
   }));
   $("shareGame").addEventListener("click", shareGame);
   $("homeButton").addEventListener("click", goHome);
+}
+
+function buildNewMatchPatch(currentGame) {
+  const leftScore = Number(currentGame.leftScore);
+  const rightScore = Number(currentGame.rightScore);
+  const patch = {
+    leftScore: 0,
+    rightScore: 0,
+    setNumber: Number(currentGame.setNumber) + 1
+  };
+
+  if (leftScore > rightScore) patch.leftGames = Number(currentGame.leftGames) + 1;
+  if (rightScore > leftScore) patch.rightGames = Number(currentGame.rightGames) + 1;
+
+  return patch;
 }
 
 function changeGames(key, amount) {
