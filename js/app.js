@@ -10,6 +10,7 @@ let saveTimer = null;
 let saving = false;
 let poller = null;
 const landingBackgrounds = ["/assets/court.jpg", "/assets/ball.jpg"];
+let showTutorialAfterStart = false;
 
 function setStatus(message) {
   $("syncStatus").textContent = message;
@@ -23,11 +24,39 @@ function showBoard(nextMode) {
   hide($("homeModal"));
   hide($("setupModal"));
   hide($("joinModal"));
+  hide($("tutorialModal"));
 }
 
 function setLandingBackground() {
   const image = landingBackgrounds[Math.floor(Math.random() * landingBackgrounds.length)];
   document.body.style.setProperty("--landing-background", `url("${image}")`);
+}
+
+function isMobileDevice() {
+  return window.matchMedia("(pointer: coarse), (max-width: 820px)").matches;
+}
+
+async function requestMobileFullscreen() {
+  if (!isMobileDevice() || document.fullscreenElement || !document.documentElement.requestFullscreen) return;
+  await document.documentElement.requestFullscreen().catch(() => {});
+}
+
+function bindDeferredFullscreen() {
+  if (!isMobileDevice() || document.fullscreenElement) return;
+  const requestOnce = () => requestMobileFullscreen();
+  document.addEventListener("pointerdown", requestOnce, { once: true });
+}
+
+function shouldShowScorekeeperTutorial() {
+  return showTutorialAfterStart && !localStorage.getItem("scorekeeperTutorialSeen");
+}
+
+function showScorekeeperTutorial() {
+  if (!shouldShowScorekeeperTutorial()) return;
+  showTutorialAfterStart = false;
+  localStorage.setItem("scorekeeperTutorialSeen", "1");
+  show($("tutorialModal"));
+  $("tutorialDone").focus();
 }
 
 async function savePatch(patch) {
@@ -105,6 +134,10 @@ async function startGame(id, nextMode) {
     canApply: () => !saving && !isEditingTeamName()
   });
   poller.start(game.version);
+  if (nextMode === "scorekeeper") {
+    bindDeferredFullscreen();
+    showScorekeeperTutorial();
+  }
 }
 
 function confirmAction({ title, message, confirmLabel, onConfirm }) {
@@ -133,6 +166,10 @@ function confirmAction({ title, message, confirmLabel, onConfirm }) {
 function closeActiveModal() {
   if (!$("confirmModal").classList.contains("hidden")) {
     $("confirmCancel").click();
+    return;
+  }
+  if (!$("tutorialModal").classList.contains("hidden")) {
+    hide($("tutorialModal"));
     return;
   }
   goHome();
@@ -171,6 +208,7 @@ function bindModals() {
   bindColorPresets();
   $("chooseScorekeeper").addEventListener("click", () => { hide($("homeModal")); show($("setupModal")); });
   $("chooseViewer").addEventListener("click", () => { hide($("homeModal")); show($("joinModal")); $("joinKey").focus(); });
+  $("tutorialDone").addEventListener("click", () => hide($("tutorialModal")));
   document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => { hide($("setupModal")); hide($("joinModal")); show($("homeModal")); }));
   document.addEventListener("keydown", event => { if (event.key === "Escape") closeActiveModal(); });
   $("setupForm").addEventListener("submit", createFromForm);
@@ -179,6 +217,8 @@ function bindModals() {
 
 async function createFromForm(event) {
   event.preventDefault();
+  showTutorialAfterStart = true;
+  await requestMobileFullscreen();
   setStatus("Creating...");
   const created = await createGame({
     leftTeam: $("setupTeam").value,
