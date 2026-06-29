@@ -9,6 +9,7 @@ let mode = "landing";
 let saveTimer = null;
 let saving = false;
 let poller = null;
+const landingBackgrounds = ["/assets/court.jpg", "/assets/ball.jpg"];
 
 function setStatus(message) {
   $("syncStatus").textContent = message;
@@ -17,10 +18,16 @@ function setStatus(message) {
 function showBoard(nextMode) {
   mode = nextMode;
   document.body.className = `${mode}-mode`;
+  document.body.style.removeProperty("--landing-background");
   $("scoreboard").hidden = false;
   hide($("homeModal"));
   hide($("setupModal"));
   hide($("joinModal"));
+}
+
+function setLandingBackground() {
+  const image = landingBackgrounds[Math.floor(Math.random() * landingBackgrounds.length)];
+  document.body.style.setProperty("--landing-background", `url("${image}")`);
 }
 
 async function savePatch(patch) {
@@ -133,14 +140,29 @@ function closeActiveModal() {
 
 function bindColorPresets() {
   let activeColorInput = $("setupTeamColor");
-  for (const input of [$("setupTeamColor"), $("setupOpponentColor")]) {
-    input.addEventListener("focus", () => { activeColorInput = input; });
-    input.addEventListener("click", () => { activeColorInput = input; });
-  }
+  const panel = $("colorPickerPanel");
+  const pickerButtons = document.querySelectorAll("[data-color-picker]");
+
+  const syncPickerButton = input => {
+    const pickerButton = document.querySelector(`[data-color-picker="${input.id}"]`);
+    pickerButton?.style.setProperty("--selected-color", input.value);
+  };
+
+  const showPanelFor = input => {
+    activeColorInput = input;
+    panel.classList.remove("hidden");
+  };
+
+  pickerButtons.forEach(button => {
+    button.addEventListener("click", () => showPanelFor($(button.dataset.colorPicker)));
+  });
+
   document.querySelectorAll("[data-color-preset]").forEach(button => {
     button.addEventListener("click", () => {
       activeColorInput.value = button.dataset.colorPreset;
-      activeColorInput.focus();
+      syncPickerButton(activeColorInput);
+      panel.classList.add("hidden");
+      document.querySelector(`[data-color-picker="${activeColorInput.id}"]`)?.focus();
     });
   });
 }
@@ -169,6 +191,7 @@ async function createFromForm(event) {
 }
 
 async function boot() {
+  setLandingBackground();
   bindModals();
   bindControls();
   const current = route();

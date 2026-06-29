@@ -58,23 +58,13 @@
       <h1 id="setupTitle">New Game</h1>
       <div class="field-row">
         <label>Team Name<input id="setupTeam" required maxlength="80" value="Home"></label>
-        <label class="color-field">Color<input id="setupTeamColor" type="color" value="#991408" list="teamColorPresets"></label>
+        <label class="color-field">Color<input id="setupTeamColor" type="hidden" value="#991408"><button class="color-picker-button" type="button" data-color-picker="setupTeamColor" style="--selected-color: #991408" aria-label="Choose team color"></button></label>
       </div>
       <div class="field-row">
         <label>Opponent<input id="setupOpponent" maxlength="80" placeholder="Opponent"></label>
-        <label class="color-field">Color<input id="setupOpponentColor" type="color" value="#3a0ca3" list="teamColorPresets"></label>
+        <label class="color-field">Color<input id="setupOpponentColor" type="hidden" value="#3a0ca3"><button class="color-picker-button" type="button" data-color-picker="setupOpponentColor" style="--selected-color: #3a0ca3" aria-label="Choose opponent color"></button></label>
       </div>
-      <datalist id="teamColorPresets">
-        <option value="#991408">
-        <option value="#3a0ca3">
-        <option value="#0b5ed7">
-        <option value="#198754">
-        <option value="#fd7e14">
-        <option value="#6f42c1">
-        <option value="#111827">
-        <option value="#f7d046">
-      </datalist>
-      <div class="color-presets" aria-label="Team color presets">
+      <div id="colorPickerPanel" class="color-picker-panel hidden" aria-label="Team color presets">
         <button type="button" data-color-preset="#991408" style="--preset-color: #991408" aria-label="Select red"></button>
         <button type="button" data-color-preset="#3a0ca3" style="--preset-color: #3a0ca3" aria-label="Select purple"></button>
         <button type="button" data-color-preset="#0b5ed7" style="--preset-color: #0b5ed7" aria-label="Select blue"></button>
