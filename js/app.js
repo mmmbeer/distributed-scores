@@ -2,6 +2,7 @@ import { createGame, getGame, updateGame } from "./api.js";
 import { $, hide, show, toast } from "./dom.js";
 import { GamePoller } from "./poller.js";
 import { goHome, goScorekeeper, goViewer, route, viewerUrl } from "./routes.js";
+import { bindScorekeeperTutorial, hasSeenScorekeeperTutorial, startScorekeeperTutorial, stopScorekeeperTutorial } from "./tutorial.js";
 import { bindGameTracker, bindTeamEditing, bindTouchZone, isEditingTeamName, render } from "./scoreboard.js";
 
 let game = null;
@@ -24,7 +25,7 @@ function showBoard(nextMode) {
   hide($("homeModal"));
   hide($("setupModal"));
   hide($("joinModal"));
-  hide($("tutorialModal"));
+  stopScorekeeperTutorial();
 }
 
 function setLandingBackground() {
@@ -48,15 +49,13 @@ function bindDeferredFullscreen() {
 }
 
 function shouldShowScorekeeperTutorial() {
-  return showTutorialAfterStart && !localStorage.getItem("scorekeeperTutorialSeen");
+  return showTutorialAfterStart && !hasSeenScorekeeperTutorial();
 }
 
 function showScorekeeperTutorial() {
   if (!shouldShowScorekeeperTutorial()) return;
   showTutorialAfterStart = false;
-  localStorage.setItem("scorekeeperTutorialSeen", "1");
-  show($("tutorialModal"));
-  $("tutorialDone").focus();
+  startScorekeeperTutorial();
 }
 
 async function savePatch(patch) {
@@ -168,8 +167,8 @@ function closeActiveModal() {
     $("confirmCancel").click();
     return;
   }
-  if (!$("tutorialModal").classList.contains("hidden")) {
-    hide($("tutorialModal"));
+  if (!$("tutorialOverlay").classList.contains("hidden")) {
+    stopScorekeeperTutorial();
     return;
   }
   goHome();
@@ -208,7 +207,7 @@ function bindModals() {
   bindColorPresets();
   $("chooseScorekeeper").addEventListener("click", () => { hide($("homeModal")); show($("setupModal")); });
   $("chooseViewer").addEventListener("click", () => { hide($("homeModal")); show($("joinModal")); $("joinKey").focus(); });
-  $("tutorialDone").addEventListener("click", () => hide($("tutorialModal")));
+  bindScorekeeperTutorial();
   document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => { hide($("setupModal")); hide($("joinModal")); show($("homeModal")); }));
   document.addEventListener("keydown", event => { if (event.key === "Escape") closeActiveModal(); });
   $("setupForm").addEventListener("submit", createFromForm);

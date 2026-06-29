@@ -87,16 +87,17 @@
   </div>
 
 
-  <div id="tutorialModal" class="modal-backdrop hidden">
-    <section class="modal-card tutorial-card" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
-      <h1 id="tutorialTitle">Scorekeeper Tips</h1>
-      <ul class="tutorial-list">
-        <li>Tap or swipe up on a team side to add a point.</li>
-        <li>Swipe down on a team side to remove a point.</li>
-        <li>Swipe left or right on the games bar to decrease or increase wins.</li>
-        <li>Use the share button in the top-right to send viewers a live link.</li>
-      </ul>
-      <div class="modal-actions single-action"><button id="tutorialDone" class="mode-primary" type="button">Got it</button></div>
+  <div id="tutorialOverlay" class="tutorial-overlay hidden" aria-live="polite">
+    <div class="tutorial-scrim"></div>
+    <section id="tutorialPopover" class="tutorial-popover" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle" aria-describedby="tutorialText">
+      <div class="tutorial-meta"><span id="tutorialStepCount">1 of 4</span></div>
+      <div id="tutorialGesture" class="tutorial-gesture up" aria-hidden="true"><span></span></div>
+      <h1 id="tutorialTitle">Add points</h1>
+      <p id="tutorialText">Tap or swipe up on either team side to add a point.</p>
+      <div class="tutorial-actions">
+        <button id="tutorialSkip" type="button">Skip</button>
+        <button id="tutorialNext" class="mode-primary" type="button">Next</button>
+      </div>
     </section>
   </div>
 
