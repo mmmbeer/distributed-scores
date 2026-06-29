@@ -2,6 +2,7 @@ import { createGame, getGame, updateGame } from "./api.js";
 import { $, hide, show, toast } from "./dom.js";
 import { GamePoller } from "./poller.js";
 import { goHome, goScorekeeper, goViewer, route, viewerUrl } from "./routes.js";
+import { bindScorekeeperTutorial, hasSeenScorekeeperTutorial, startScorekeeperTutorial, stopScorekeeperTutorial } from "./tutorial.js";
 import { bindGameTracker, bindTeamEditing, bindTouchZone, isEditingTeamName, render } from "./scoreboard.js";
 
 let game = null;
@@ -9,6 +10,8 @@ let mode = "landing";
 let saveTimer = null;
 let saving = false;
 let poller = null;
+const landingBackgrounds = ["/assets/court.jpg", "/assets/ball.jpg"];
+let showTutorialAfterStart = false;
 
 function setStatus(message) {
   $("syncStatus").textContent = message;
@@ -17,10 +20,42 @@ function setStatus(message) {
 function showBoard(nextMode) {
   mode = nextMode;
   document.body.className = `${mode}-mode`;
+  document.body.style.removeProperty("--landing-background");
   $("scoreboard").hidden = false;
   hide($("homeModal"));
   hide($("setupModal"));
   hide($("joinModal"));
+  stopScorekeeperTutorial();
+}
+
+function setLandingBackground() {
+  const image = landingBackgrounds[Math.floor(Math.random() * landingBackgrounds.length)];
+  document.body.style.setProperty("--landing-background", `url("${image}")`);
+}
+
+function isMobileDevice() {
+  return window.matchMedia("(pointer: coarse), (max-width: 820px)").matches;
+}
+
+async function requestMobileFullscreen() {
+  if (!isMobileDevice() || document.fullscreenElement || !document.documentElement.requestFullscreen) return;
+  await document.documentElement.requestFullscreen().catch(() => {});
+}
+
+function bindDeferredFullscreen() {
+  if (!isMobileDevice() || document.fullscreenElement) return;
+  const requestOnce = () => requestMobileFullscreen();
+  document.addEventListener("pointerdown", requestOnce, { once: true });
+}
+
+function shouldShowScorekeeperTutorial() {
+  return showTutorialAfterStart && !hasSeenScorekeeperTutorial();
+}
+
+function showScorekeeperTutorial() {
+  if (!shouldShowScorekeeperTutorial()) return;
+  showTutorialAfterStart = false;
+  startScorekeeperTutorial();
 }
 
 async function savePatch(patch) {
@@ -98,6 +133,10 @@ async function startGame(id, nextMode) {
     canApply: () => !saving && !isEditingTeamName()
   });
   poller.start(game.version);
+  if (nextMode === "scorekeeper") {
+    bindDeferredFullscreen();
+    showScorekeeperTutorial();
+  }
 }
 
 function confirmAction({ title, message, confirmLabel, onConfirm }) {
@@ -128,19 +167,38 @@ function closeActiveModal() {
     $("confirmCancel").click();
     return;
   }
+  if (!$("tutorialOverlay").classList.contains("hidden")) {
+    stopScorekeeperTutorial();
+    return;
+  }
   goHome();
 }
 
 function bindColorPresets() {
   let activeColorInput = $("setupTeamColor");
-  for (const input of [$("setupTeamColor"), $("setupOpponentColor")]) {
-    input.addEventListener("focus", () => { activeColorInput = input; });
-    input.addEventListener("click", () => { activeColorInput = input; });
-  }
+  const panel = $("colorPickerPanel");
+  const pickerButtons = document.querySelectorAll("[data-color-picker]");
+
+  const syncPickerButton = input => {
+    const pickerButton = document.querySelector(`[data-color-picker="${input.id}"]`);
+    pickerButton?.style.setProperty("--selected-color", input.value);
+  };
+
+  const showPanelFor = input => {
+    activeColorInput = input;
+    panel.classList.remove("hidden");
+  };
+
+  pickerButtons.forEach(button => {
+    button.addEventListener("click", () => showPanelFor($(button.dataset.colorPicker)));
+  });
+
   document.querySelectorAll("[data-color-preset]").forEach(button => {
     button.addEventListener("click", () => {
       activeColorInput.value = button.dataset.colorPreset;
-      activeColorInput.focus();
+      syncPickerButton(activeColorInput);
+      panel.classList.add("hidden");
+      document.querySelector(`[data-color-picker="${activeColorInput.id}"]`)?.focus();
     });
   });
 }
@@ -149,6 +207,7 @@ function bindModals() {
   bindColorPresets();
   $("chooseScorekeeper").addEventListener("click", () => { hide($("homeModal")); show($("setupModal")); });
   $("chooseViewer").addEventListener("click", () => { hide($("homeModal")); show($("joinModal")); $("joinKey").focus(); });
+  bindScorekeeperTutorial();
   document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", () => { hide($("setupModal")); hide($("joinModal")); show($("homeModal")); }));
   document.addEventListener("keydown", event => { if (event.key === "Escape") closeActiveModal(); });
   $("setupForm").addEventListener("submit", createFromForm);
@@ -157,6 +216,8 @@ function bindModals() {
 
 async function createFromForm(event) {
   event.preventDefault();
+  showTutorialAfterStart = true;
+  await requestMobileFullscreen();
   setStatus("Creating...");
   const created = await createGame({
     leftTeam: $("setupTeam").value,
@@ -169,6 +230,7 @@ async function createFromForm(event) {
 }
 
 async function boot() {
+  setLandingBackground();
   bindModals();
   bindControls();
   const current = route();
