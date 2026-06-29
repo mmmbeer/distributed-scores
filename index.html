@@ -13,14 +13,9 @@
     <button id="homeButton" class="chrome-button top-left" type="button" aria-label="Home">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5v8a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-8Z"/></svg>
     </button>
-    <div class="top-right chrome-actions scorekeeper-only">
-      <button id="swapSides" class="chrome-button" type="button" aria-label="Swap team sides">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10.6l-3.3-3.3L16 2l6.2 6.2L16 14.4l-1.7-1.7 3.3-3.3H7V7Zm10 10H6.4l3.3 3.3L8 22l-6.2-6.2L8 9.6l1.7 1.7-3.3 3.3H17V17Z"/></svg>
-      </button>
-      <button id="shareGame" class="chrome-button" type="button" aria-label="Share viewer link">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.76 0-1.44.3-1.96.77L8.91 12.7a3.3 3.3 0 0 0 0-1.39l7.05-4.12A3 3 0 1 0 15 5c0 .23.03.45.08.66L8.03 9.78a3 3 0 1 0 0 4.44l7.12 4.18c-.04.19-.06.39-.06.6a3 3 0 1 0 3-2.9Z"/></svg>
-      </button>
-    </div>
+    <button id="shareGame" class="chrome-button top-right scorekeeper-only" type="button" aria-label="Share viewer link">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.76 0-1.44.3-1.96.77L8.91 12.7a3.3 3.3 0 0 0 0-1.39l7.05-4.12A3 3 0 1 0 15 5c0 .23.03.45.08.66L8.03 9.78a3 3 0 1 0 0 4.44l7.12 4.18c-.04.19-.06.39-.06.6a3 3 0 1 0 3-2.9Z"/></svg>
+    </button>
 
     <section id="leftSide" class="side left">
       <header class="team-header">
@@ -42,6 +37,9 @@
     <div id="syncStatus" class="sync-status">Live sync</div>
     <nav class="controls scorekeeper-only" aria-label="Scorekeeper controls">
       <button id="newSet" class="text-button" type="button">New Match</button>
+      <button id="swapSides" class="icon-button" type="button" aria-label="Swap team sides">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10.6l-3.3-3.3L16 2l6.2 6.2L16 14.4l-1.7-1.7 3.3-3.3H7V7Zm10 10H6.4l3.3 3.3L8 22l-6.2-6.2L8 9.6l1.7 1.7-3.3 3.3H17V17Z"/></svg>
+      </button>
       <button id="resetMatch" class="text-button danger-button" type="button">Reset Score</button>
     </nav>
   </main>

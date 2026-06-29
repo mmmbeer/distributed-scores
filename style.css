@@ -570,18 +570,9 @@ a {
   right: 0.75rem;
 }
 
-.chrome-actions {
-  display: flex;
-  gap: 0.55rem;
-}
-
-.chrome-actions .chrome-button {
-  position: static;
-}
 
 .controls {
   width: auto;
-  flex-direction: column;
   align-items: center;
   gap: 0.65rem;
 }
