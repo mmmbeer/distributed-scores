@@ -73,6 +73,7 @@ function showStep() {
   const target = $(step.target);
   if (!target) return nextStep();
   target.classList.add("tutorial-highlight");
+  positionTutorialSpotlight(target);
   $("tutorialTitle").textContent = step.title;
   $("tutorialText").textContent = step.text;
   $("tutorialStepCount").textContent = `${activeStep + 1} of ${steps.length}`;
@@ -105,4 +106,15 @@ function positionTutorialStep() {
   const left = Math.min(Math.max(16, rect.left + rect.width / 2 - width / 2), window.innerWidth - width - 16);
 
   popover.style.transform = `translate(${left}px, ${top}px)`;
+  positionTutorialSpotlight(target);
+}
+
+function positionTutorialSpotlight(target) {
+  const spotlight = $("tutorialSpotlight");
+  if (!spotlight || !target) return;
+  const rect = target.getBoundingClientRect();
+  const padding = 8;
+  spotlight.style.width = `${rect.width + padding * 2}px`;
+  spotlight.style.height = `${rect.height + padding * 2}px`;
+  spotlight.style.transform = `translate(${rect.left - padding}px, ${rect.top - padding}px)`;
 }
