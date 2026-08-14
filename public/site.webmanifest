@@ -1,7 +1,7 @@
 {
   "name": "Shared Scores",
   "short_name": "Scores",
-  "description": "Live volleyball scorekeeping for the sideline and every remote viewer.",
+  "description": "Live multi-sport scorekeeping for the sideline and every remote viewer.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

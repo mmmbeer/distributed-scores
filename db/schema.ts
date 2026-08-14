@@ -16,6 +16,7 @@ export const matches = sqliteTable("matches", {
   bestOf: integer("best_of").notNull().default(3),
   leftTeam: text("left_team").notNull().default("a"),
   status: text("status").notNull().default("live"),
+  scoreData: text("score_data").notNull().default("{}"),
   version: integer("version").notNull().default(1),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),

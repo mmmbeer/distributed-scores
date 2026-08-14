@@ -1,0 +1,1 @@
+ALTER TABLE `matches` ADD `score_data` text DEFAULT '{}' NOT NULL;

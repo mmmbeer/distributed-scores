@@ -3,6 +3,7 @@
 import { FormEvent, PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { segmentLabel, SPORT_IDS, SPORTS, tennisPointLabel, type Sport } from "../lib/sports";
 
 type TeamKey = "a" | "b";
 type Side = "left" | "right";
@@ -10,7 +11,7 @@ type Team = { name: string; color: string; points: number; sets: number };
 type CompletedSet = { setNumber: number; teamAScore: number; teamBScore: number; winner: TeamKey };
 type Match = {
   code: string;
-  sport: "volleyball";
+  sport: Sport;
   teamA: Team;
   teamB: Team;
   leftTeamKey: TeamKey;
@@ -23,6 +24,7 @@ type Match = {
   updatedAt: string;
   expiresAt: string;
   sets: CompletedSet[];
+  state: { gamesA?: number; gamesB?: number; tiebreak?: boolean; target?: number };
 };
 
 type SavedScorekeeperSession = { code: string; token: string; createdAt: string };
@@ -113,13 +115,15 @@ function CodeInput({ value, onChange, onSubmit }: { value: string; onChange: (va
 
 function ScoreRail({ match, mode, onOpen }: { match: Match; mode: "watch" | "keep"; onOpen: () => void }) {
   const sides = getSides(match);
+  const leftKey = match.leftTeamKey;
+  const rightKey = leftKey === "a" ? "b" : "a";
   const label = mode === "keep" ? "Resume scoring" : "Watch score";
   return (
     <button className={`score-rail ${mode === "keep" ? "score-rail-owned" : ""}`} onClick={onOpen} aria-label={`${label}: ${sides.left.name} ${sides.left.points}, ${sides.right.name} ${sides.right.points}`}>
-      <span className="score-rail-state"><i />{match.status === "complete" ? "Final" : "Live"}<small>Set {match.currentSet}</small></span>
-      <span className="score-rail-team" style={{ "--rail-color": sides.left.color } as React.CSSProperties}><i /><b>{sides.left.name}</b><strong>{sides.left.points}</strong><small>Sets {sides.left.sets}</small></span>
+      <span className="score-rail-state"><i />{match.status === "complete" ? "Final" : "Live"}<small>{SPORTS[match.sport].name} · {segmentLabel(match.sport, match.currentSet, match.bestOf)}</small></span>
+      <span className="score-rail-team" style={{ "--rail-color": sides.left.color } as React.CSSProperties}><i /><b>{sides.left.name}</b><strong>{displayScore(match, leftKey)}</strong><small>{secondaryScore(match, leftKey)}</small></span>
       <span className="score-rail-divider">:</span>
-      <span className="score-rail-team" style={{ "--rail-color": sides.right.color } as React.CSSProperties}><i /><b>{sides.right.name}</b><strong>{sides.right.points}</strong><small>Sets {sides.right.sets}</small></span>
+      <span className="score-rail-team" style={{ "--rail-color": sides.right.color } as React.CSSProperties}><i /><b>{sides.right.name}</b><strong>{displayScore(match, rightKey)}</strong><small>{secondaryScore(match, rightKey)}</small></span>
       <span className="score-rail-code"><small>{mode === "keep" ? "Scorekeeper" : "Code"}</small><b>{match.code}</b><i aria-hidden="true">→</i></span>
     </button>
   );
@@ -177,7 +181,12 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
       </header>
 
       <section className="arena-hero">
-        <div className="arena-photo" role="img" aria-label="Volleyball players contesting the ball above the net" />
+        <div className="arena-photo" role="img" aria-label="Rotating sideline action from volleyball, basketball, soccer, and tennis">
+          <span className="hero-sport-photo hero-volleyball" />
+          <span className="hero-sport-photo hero-basketball" />
+          <span className="hero-sport-photo hero-soccer" />
+          <span className="hero-sport-photo hero-tennis" />
+        </div>
         <div className="arena-copy">
           <span className="sport-label"><i /> Live scorekeeping</span>
           <h1>Every point.<br /><em>Everywhere.</em></h1>
@@ -187,6 +196,7 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
             <a href="#watch">I have a match code</a>
           </div>
           <small>No account. No install. Just the score.</small>
+          <div className="hero-sport-list" aria-label="Supported sports">Volleyball <i /> Basketball <i /> Football <i /> Tennis <i /> Baseball <i /> Hockey <i /> Soccer <i /> Pickleball <i /> Badminton</div>
         </div>
         <div className="hero-score" aria-label="Example live score: North Stars 23, Eagles 21">
           <div className="hero-score-status"><i /> Live <span>Set 2</span></div>
@@ -195,7 +205,7 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
           <div className="hero-score-team"><span>Eagles</span><strong>21</strong><small>Sets 0</small></div>
           <div className="hero-score-code"><span>Watch code</span><strong>COURT</strong></div>
         </div>
-        <a className="photo-credit hero-credit" href="https://unsplash.com/photos/volleyball-players-jump-to-hit-the-ball-over-the-net-ErPSzVX066Q" target="_blank" rel="noreferrer">Photo: Naveen Ketterer / Unsplash</a>
+        <div className="photo-credit hero-credit">Photos: <a href="https://unsplash.com/photos/volleyball-players-jump-to-hit-the-ball-over-the-net-ErPSzVX066Q" target="_blank" rel="noreferrer">N. Ketterer</a> · <a href="https://unsplash.com/photos/basketball-players-in-action-during-a-game-h9teyHyKvds" target="_blank" rel="noreferrer">S. Kessler</a> · <a href="https://unsplash.com/photos/soccer-players-in-action-during-an-outdoor-game-on-grass-B2HEmGkLsVY" target="_blank" rel="noreferrer">M. Protzen</a> · <a href="https://www.pexels.com/photo/tennis-player-in-action-on-outdoor-court-36231026/" target="_blank" rel="noreferrer">S. Mren</a></div>
       </section>
 
       <div className="score-ticker" aria-hidden="true">
@@ -235,7 +245,7 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
           <h2>One phone.<br /><em>Every screen.</em></h2>
         </header>
         <ol>
-          <li><b>01</b><div><h3>Set the matchup</h3><p>Name the teams, choose their colors and pick best of three or five.</p></div><span aria-hidden="true">→</span></li>
+          <li><b>01</b><div><h3>Set the matchup</h3><p>Choose the sport, name both sides and use the format built for that game.</p></div><span aria-hidden="true">→</span></li>
           <li><b>02</b><div><h3>Score at game speed</h3><p>Tap or swipe on either side. Big controls stay fast and readable courtside.</p></div><span aria-hidden="true">→</span></li>
           <li><b>03</b><div><h3>Send the code</h3><p>One link keeps everyone current, whether ten people watch or hundreds do.</p></div><span aria-hidden="true">→</span></li>
         </ol>
@@ -249,7 +259,7 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
           <span className="section-kicker">Built for the sideline</span>
           <h2>Nothing between you and the next point.</h2>
           <p>The scorekeeper view fills the phone, stays awake and puts every action under one thumb. Viewers get a clean scoreboard that follows along in real time.</p>
-          <button className="sport-link" onClick={onSetup}>Start a volleyball match <span aria-hidden="true">↗</span></button>
+          <button className="sport-link" onClick={onSetup}>Start a scoreboard <span aria-hidden="true">↗</span></button>
         </div>
         <div className="sideline-photo sideline-photo-board" role="img" aria-label="Basketball game and arena scoreboard">
           <a className="photo-credit" href="https://unsplash.com/photos/basketball-game-in-progress-with-a-scoreboard-Rl8ZSwK4WnA" target="_blank" rel="noreferrer">Photo: Luke Miller / Unsplash</a>
@@ -266,7 +276,7 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
 
       <footer className="landing-footer">
         <Brand compact />
-        <p>Fast live scoring for volleyball matches, tournaments and pickup games.</p>
+        <p>Fast live scoring for courts, fields, rinks and diamonds.</p>
         <nav><a href="#watch">Watch a match</a><a href="/developers">Score API</a></nav>
       </footer>
     </main>
@@ -285,11 +295,13 @@ function ColorPicker({ value, onChange, label }: { value: string; onChange: (val
 }
 
 function SetupModal({ onCancel, onCreated }: { onCancel: () => void; onCreated: (code: string) => void }) {
+  const [sport, setSport] = useState<Sport>("volleyball");
   const [teamAName, setTeamAName] = useState("Home");
   const [teamBName, setTeamBName] = useState("Visitors");
   const [teamAColor, setTeamAColor] = useState(COLORS[0]);
   const [teamBColor, setTeamBColor] = useState(COLORS[1]);
   const [bestOf, setBestOf] = useState(3);
+  const [target, setTarget] = useState(11);
   const [showOnHome, setShowOnHome] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -344,7 +356,7 @@ function SetupModal({ onCancel, onCreated }: { onCancel: () => void; onCreated: 
     try {
       const result = await api<{ match: Match; scorekeeperToken: string }>("/api/v1/matches", {
         method: "POST",
-        body: JSON.stringify({ teamAName, teamBName, teamAColor, teamBColor, bestOf, showOnHome }),
+        body: JSON.stringify({ sport, teamAName, teamBName, teamAColor, teamBColor, bestOf, target, showOnHome }),
       });
       sessionStorage.setItem(`scorekeeper:${result.match.code}`, result.scorekeeperToken);
       saveScorekeeperSession(result.match.code, result.scorekeeperToken);
@@ -359,30 +371,44 @@ function SetupModal({ onCancel, onCreated }: { onCancel: () => void; onCreated: 
     <div className="setup-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onCancel(); }}>
       <form ref={dialogRef} className="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setup-title" aria-describedby="setup-description" onSubmit={submit}>
         <header className="setup-modal-header">
-          <span className="eyebrow"><i /> New volleyball match</span>
+          <span className="eyebrow"><i /> New {SPORTS[sport].name} scoreboard</span>
           <button className="setup-close" type="button" onClick={onCancel} aria-label="Close match setup">×</button>
         </header>
         <div className="setup-modal-intro">
           <h1 id="setup-title">Set the matchup</h1>
-          <p id="setup-description">Team details appear on the public live score.</p>
+          <p id="setup-description">Choose a sport and set the two sides. Details appear on the public live score.</p>
         </div>
+        <fieldset className="sport-picker">
+          <legend>Sport</legend>
+          <div>{SPORT_IDS.map((id) => <button key={id} type="button" className={sport === id ? "selected" : ""} aria-pressed={sport === id} onClick={() => {
+            setSport(id);
+            setBestOf(SPORTS[id].formatOptions[0].value);
+            if (SPORTS[id].sideNoun === "Player") {
+              if (teamAName === "Home") setTeamAName("Player one");
+              if (teamBName === "Visitors") setTeamBName("Player two");
+            } else {
+              if (teamAName === "Player one") setTeamAName("Home");
+              if (teamBName === "Player two") setTeamBName("Visitors");
+            }
+          }}><span>{SPORTS[id].icon}</span><b>{SPORTS[id].name}</b></button>)}</div>
+        </fieldset>
         <div className="team-setup-grid">
           <section style={{ "--team-color": teamAColor } as React.CSSProperties}>
-            <span className="team-label">Team one</span>
-            <label>Team name<input ref={firstInputRef} value={teamAName} onChange={(event) => setTeamAName(event.target.value)} maxLength={50} required /></label>
+            <span className="team-label">{SPORTS[sport].sideNoun} one</span>
+            <label>{SPORTS[sport].sideNoun} name<input ref={firstInputRef} value={teamAName} onChange={(event) => setTeamAName(event.target.value)} maxLength={50} required /></label>
             <ColorPicker value={teamAColor} onChange={setTeamAColor} label="Team color" />
           </section>
           <section style={{ "--team-color": teamBColor } as React.CSSProperties}>
-            <span className="team-label">Team two</span>
-            <label>Team name<input value={teamBName} onChange={(event) => setTeamBName(event.target.value)} maxLength={50} required /></label>
+            <span className="team-label">{SPORTS[sport].sideNoun} two</span>
+            <label>{SPORTS[sport].sideNoun} name<input value={teamBName} onChange={(event) => setTeamBName(event.target.value)} maxLength={50} required /></label>
             <ColorPicker value={teamBColor} onChange={setTeamBColor} label="Team color" />
           </section>
         </div>
         <fieldset className="format-picker">
           <legend>Match format</legend>
-          <label><input type="radio" name="format" checked={bestOf === 3} onChange={() => setBestOf(3)} /><span><b>Best of 3</b><small>First to 2 sets</small></span></label>
-          <label><input type="radio" name="format" checked={bestOf === 5} onChange={() => setBestOf(5)} /><span><b>Best of 5</b><small>First to 3 sets</small></span></label>
+          {SPORTS[sport].formatOptions.map((option) => <label key={option.value}><input type="radio" name="format" checked={bestOf === option.value} onChange={() => setBestOf(option.value)} /><span><b>{option.label}</b><small>{option.detail}</small></span></label>)}
         </fieldset>
+        {sport === "pickleball" && <fieldset className="target-picker"><legend>Points per game</legend>{[11, 15, 21].map((value) => <label key={value}><input type="radio" name="target" checked={target === value} onChange={() => setTarget(value)} /><span>{value}</span></label>)}</fieldset>}
         <label className="home-listing-option">
           <input type="checkbox" checked={showOnHome} onChange={(event) => setShowOnHome(event.target.checked)} />
           <span><i aria-hidden="true">✓</i><b>Show this score on the home page</b><small>Anyone can open the live score. Uncheck this for code-only sharing.</small></span>
@@ -408,7 +434,28 @@ function getSides(match: Match) {
   return { left, right };
 }
 
+function displayScore(match: Match, key: TeamKey) {
+  const team = key === "a" ? match.teamA : match.teamB;
+  const opponent = key === "a" ? match.teamB : match.teamA;
+  return match.sport === "tennis" ? tennisPointLabel(team.points, opponent.points, match.state.tiebreak) : String(team.points);
+}
+
+function secondaryScore(match: Match, key: TeamKey) {
+  const team = key === "a" ? match.teamA : match.teamB;
+  if (match.sport === "tennis") return `${key === "a" ? match.state.gamesA || 0 : match.state.gamesB || 0} games · ${team.sets} sets`;
+  if (SPORTS[match.sport].unit === "set") return `${team.sets} ${team.sets === 1 ? "set" : "sets"}`;
+  return segmentLabel(match.sport, match.currentSet, match.bestOf);
+}
+
+function matchStatusLine(match: Match) {
+  if (match.status === "complete") return "Match complete";
+  if (match.sport === "tennis") return `${match.state.tiebreak ? "Tiebreak" : `Games ${match.state.gamesA || 0}–${match.state.gamesB || 0}`} · best of ${match.bestOf}`;
+  if (SPORTS[match.sport].unit === "set") return `Playing to ${match.currentTarget}${match.sport === "badminton" ? " · cap at 30" : " · win by 2"}`;
+  return `${segmentLabel(match.sport, match.currentSet, match.bestOf)} of ${match.bestOf}`;
+}
+
 function winnerReady(match: Match): TeamKey | null {
+  if (!["volleyball", "pickleball", "badminton"].includes(match.sport)) return null;
   const a = match.teamA.points;
   const b = match.teamB.points;
   if (a >= match.currentTarget && a - b >= 2) return "a";
@@ -417,9 +464,9 @@ function winnerReady(match: Match): TeamKey | null {
 }
 
 function SetHistory({ match }: { match: Match }) {
-  if (!match.sets.length) return <span className="no-sets">No completed sets</span>;
+  if (!match.sets.length) return <span className="no-sets">No completed {SPORTS[match.sport].unit}s</span>;
   return <div className="set-history">{match.sets.map((set) => (
-    <span key={set.setNumber}><small>S{set.setNumber}</small><b>{set.teamAScore}</b><i>–</i><b>{set.teamBScore}</b></span>
+    <span key={set.setNumber}><small>{SPORTS[match.sport].unit.slice(0, 1).toUpperCase()}{set.setNumber}</small><b>{set.teamAScore}</b><i>–</i><b>{set.teamBScore}</b></span>
   ))}</div>;
 }
 
@@ -465,6 +512,8 @@ function LiveBoard({
   }
 
   function scoreSide(side: Side, team: Team) {
+    const teamKey: TeamKey = side === "left" ? match.leftTeamKey : match.leftTeamKey === "a" ? "b" : "a";
+    const quickScores = SPORTS[match.sport].scoreButtons.filter((amount) => amount > 1);
     return (
       <section
         className="score-side"
@@ -489,11 +538,12 @@ function LiveBoard({
           event.preventDefault();
           onGesture?.(side, next[0], next[1]);
         }}
-        aria-label={scorekeeper ? `${team.name}, ${team.points} points and ${team.sets} sets. Tap or swipe to update.` : undefined}
+        aria-label={scorekeeper ? `${team.name}, score ${displayScore(match, teamKey)}, ${secondaryScore(match, teamKey)}. Tap or swipe to update.` : undefined}
       >
-        <div className="side-heading"><span className="color-dot" /><h2>{team.name}</h2><small>{team.sets} {team.sets === 1 ? "set" : "sets"}</small></div>
-        <strong className="big-score" aria-label={`${team.name} ${team.points}`}>{team.points}</strong>
-        {scorekeeper && <div className="gesture-cues" aria-hidden="true"><span>↑ + point</span><span>swipe</span><span>set − / + →</span></div>}
+        <div className="side-heading"><span className="color-dot" /><h2>{team.name}</h2><small>{secondaryScore(match, teamKey)}</small></div>
+        <strong className="big-score" aria-label={`${team.name} ${displayScore(match, teamKey)}`}>{displayScore(match, teamKey)}</strong>
+        {scorekeeper && quickScores.length > 0 && <div className="score-actions" aria-label={`${team.name} scoring plays`}>{quickScores.map((amount) => <button key={amount} type="button" onPointerDown={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); onGesture?.(side, "point", amount); }}>+{amount}</button>)}</div>}
+        {scorekeeper && <div className="gesture-cues" aria-hidden="true"><span>↑ + score</span><span>tap +1</span><span>win − / + →</span></div>}
         {feedback?.side === side && <span key={feedback.id} className="gesture-feedback" aria-live="polite">{feedback.text}</span>}
       </section>
     );
@@ -502,7 +552,7 @@ function LiveBoard({
   return (
     <div className={`live-board ${scorekeeper ? "scorekeeper-board" : "viewer-board"}`}>
       {scoreSide("left", left)}
-      <div className="court-center"><span>{match.status === "complete" ? "FINAL" : `SET ${match.currentSet}`}</span><i>:</i><small>BEST OF {match.bestOf}</small></div>
+      <div className="court-center"><span>{match.status === "complete" ? "FINAL" : segmentLabel(match.sport, match.currentSet, match.bestOf).toUpperCase()}</span><i>:</i><small>{SPORTS[match.sport].name.toUpperCase()}</small></div>
       {scoreSide("right", right)}
     </div>
   );
@@ -632,7 +682,7 @@ function WatchView({ code }: { code: string }) {
         <button className="header-action" onClick={async () => { await shareMatch(match); setCopied(true); window.setTimeout(() => setCopied(false), 1600); }}>{copied ? "Copied" : "Share"}</button>
       </header>
       <LiveBoard match={match} scorekeeper={false} />
-      <footer className="viewer-footer"><SetHistory match={match} /><span>{match.status === "complete" ? "Match complete" : `Playing to ${match.currentTarget} · win by 2`}</span></footer>
+      <footer className="viewer-footer"><SetHistory match={match} /><span>{matchStatusLine(match)}</span></footer>
     </main>
   );
 }
@@ -689,8 +739,8 @@ function KeeperSettings({
         <div className="gesture-key">
           <b>Gesture controls</b>
           <span><i>Tap</i> Add point</span>
-          <span><i>↑ / ↓</i> Add / remove point</span>
-          <span><i>← / →</i> Remove / add set win</span>
+          <span><i>↑ / ↓</i> Add / remove score</span>
+          <span><i>← / →</i> Remove / add win</span>
         </div>
         <button className="settings-reset" type="button" onClick={onReset}>Reset match</button>
       </section>
@@ -779,7 +829,7 @@ function KeepView({ code, onHome }: { code: string; onHome: () => void }) {
   function point(side: Side, amount: number) {
     if (!match || match.status === "complete") return;
     pending.current += 1;
-    setMatch((current) => {
+    if (match.sport !== "tennis") setMatch((current) => {
       if (!current) return current;
       const teamKey = side === "left" ? current.leftTeamKey : current.leftTeamKey === "a" ? "b" : "a";
       const key = teamKey === "a" ? "teamA" : "teamB";
@@ -798,7 +848,7 @@ function KeepView({ code, onHome }: { code: string; onHome: () => void }) {
       const nextSets = Math.min(current.setsToWin, Math.max(0, current[key].sets + amount));
       const nextTeam = { ...current[key], sets: nextSets };
       const otherSets = teamKey === "a" ? current.teamB.sets : current.teamA.sets;
-      const status = Math.max(nextSets, otherSets) >= current.setsToWin ? "complete" : "live";
+      const status = SPORTS[current.sport].unit === "set" && Math.max(nextSets, otherSets) >= current.setsToWin ? "complete" : "live";
       return { ...current, [key]: nextTeam, status };
     });
     queue.current = queue.current.then(() => send({ action: "setCount", side, amount })).catch((reason) => setNotice(reason instanceof Error ? reason.message : "Set count did not save")).finally(() => { pending.current -= 1; });
@@ -821,10 +871,10 @@ function KeepView({ code, onHome }: { code: string; onHome: () => void }) {
     navigator.vibrate?.(12);
     if (kind === "point") {
       point(side, amount);
-      showGestureFeedback(side, amount > 0 ? "+1" : "−1");
+      showGestureFeedback(side, amount > 0 ? `+${amount}` : "UNDO");
     } else {
       setWin(side, amount);
-      showGestureFeedback(side, amount > 0 ? "SET +1" : "SET −1");
+      showGestureFeedback(side, amount > 0 ? "WIN +1" : "WIN −1");
     }
   }
 
@@ -857,6 +907,9 @@ function KeepView({ code, onHome }: { code: string; onHome: () => void }) {
   if (!token) return <MatchError message="This link can watch the score, but it does not include the private scorekeeper key." />;
   const ready = winnerReady(match);
   const readyName = ready === "a" ? match.teamA.name : ready === "b" ? match.teamB.name : "";
+  const setScoring = ["volleyball", "pickleball", "badminton"].includes(match.sport);
+  const automatic = match.sport === "tennis";
+  const advanceLabel = match.currentSet >= match.bestOf ? "Finish game" : `End ${segmentLabel(match.sport, match.currentSet, match.bestOf)}`;
 
   return (
     <main className="match-shell keep-shell">
@@ -870,7 +923,7 @@ function KeepView({ code, onHome }: { code: string; onHome: () => void }) {
       <nav className="keeper-controls" aria-label="Match controls">
         <button onClick={() => run({ action: "swap" })} disabled={busy} aria-label="Swap team sides"><span aria-hidden="true">⇄</span><small>Sides</small></button>
         <button onClick={() => setEditOpen(true)} disabled={busy} aria-label="Edit teams"><span aria-hidden="true">✎</span><small>Teams</small></button>
-        <button className={ready ? "finish-ready" : ""} onClick={() => ready && run({ action: "finishSet", winner: ready }, "Set recorded")} disabled={!ready || busy}>{ready ? `Finish · ${readyName}` : `Set ${match.currentSet} · ${match.currentTarget}`}</button>
+        <button className={ready || (!setScoring && !automatic) ? "finish-ready" : ""} onClick={() => setScoring ? ready && run({ action: "finishSet", winner: ready }, "Game recorded") : !automatic && run({ action: "advance" }, match.currentSet >= match.bestOf ? "Final recorded" : "Segment recorded")} disabled={(setScoring && !ready) || automatic || busy}>{setScoring ? (ready ? `Finish · ${readyName}` : `${segmentLabel(match.sport, match.currentSet, match.bestOf)} · ${match.currentTarget}`) : automatic ? matchStatusLine(match) : advanceLabel}</button>
         <button onClick={() => setSettingsOpen(true)} aria-label="Scorekeeper settings"><span aria-hidden="true">⚙</span><small>Settings</small></button>
       </nav>
       {notice && <div className="keeper-notice" role="status">{notice}</div>}
@@ -880,7 +933,7 @@ function KeepView({ code, onHome }: { code: string; onHome: () => void }) {
         fullscreenActive={fullscreenActive}
         onToggle={togglePreference}
         onReset={() => {
-          if (window.confirm("Reset all points and completed sets for this match?")) {
+          if (window.confirm("Reset the score and completed segments for this match?")) {
             setSettingsOpen(false);
             void run({ action: "reset" });
           }
@@ -895,9 +948,9 @@ export function DevelopersView() {
   return (
     <main className="developer-shell">
       <header><Brand /><Link className="button button-dark" href="/">Open the app</Link></header>
-      <section className="developer-hero"><span className="eyebrow"><i /> Public read API</span><h1>Put the live score<br />anywhere.</h1><p>Read a match as JSON or subscribe to the same live score events used by the viewer page. Public endpoints are read-only and support cross-origin requests.</p></section>
+      <section className="developer-hero"><span className="eyebrow"><i /> Public read API</span><h1>Put the live score<br />anywhere.</h1><p>Read any supported sport as JSON or subscribe to the same live score events used by the viewer page. Public endpoints are read-only and support cross-origin requests.</p></section>
       <section className="api-grid">
-        <article><span>Snapshot</span><h2>Get current score</h2><code>GET /api/v1/matches/{"{code}"}</code><p>Returns teams, colors, points, completed sets, match status, and a monotonically increasing version.</p></article>
+        <article><span>Snapshot</span><h2>Get current score</h2><code>GET /api/v1/matches/{"{code}"}</code><p>Returns the sport, two sides, current score, segment history, match status, and a monotonically increasing version.</p></article>
         <article><span>Live stream</span><h2>Subscribe to changes</h2><code>GET /api/v1/matches/{"{code}"}/events</code><p>A Server-Sent Events stream. Listen for <b>score</b> events and read the match object from each event.</p></article>
       </section>
       <section className="code-example"><header><span>Browser example</span><a href="/api/v1/openapi.json">OpenAPI JSON</a></header><pre>{`const source = new EventSource(

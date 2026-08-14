@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { DevelopersView } from "../score-app";
 
-const description = "Read live volleyball scores as JSON or subscribe to real-time score events with the Shared Scores public API.";
+const description = "Read live multi-sport scores as JSON or subscribe to real-time score events with the Shared Scores public API.";
 
 export const metadata: Metadata = {
   title: "Live Score API",

@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 const siteUrl = "https://scores.fairway3games.com";
-const title = "Shared Scores | Live Volleyball Scorekeeping";
-const description = "Keep score courtside and share a live volleyball scoreboard with anyone using one link or six-character match code.";
+const title = "Shared Scores | Live Sideline Scorekeeping";
+const description = "Keep score courtside and share a live scoreboard for volleyball, basketball, football, tennis, baseball, hockey, soccer, pickleball, and badminton.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   description,
   applicationName: "Shared Scores",
   category: "sports",
-  keywords: ["live volleyball scores", "volleyball scorekeeper", "live scoreboard", "share scores", "volleyball scoring app"],
+  keywords: ["live sports scores", "scorekeeping app", "live scoreboard", "share scores", "volleyball scoring", "basketball scoring", "tennis scoring"],
   alternates: { canonical: "/" },
   robots: {
     index: true,
@@ -51,6 +51,7 @@ export const metadata: Metadata = {
     apple: "/shared-scores-mark.png",
   },
   manifest: "/site.webmanifest",
+  other: { "codex-preview": "development" },
 };
 
 export const viewport: Viewport = { themeColor: "#3581B8", colorScheme: "light" };
@@ -77,7 +78,7 @@ const structuredData = {
       browserRequirements: "Requires JavaScript and a modern web browser",
       isAccessibleForFree: true,
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      featureList: ["Real-time volleyball scoreboard", "Shareable match link and code", "Mobile scorekeeper controls", "Public read-only score API"],
+      featureList: ["Real-time multi-sport scoreboard", "Shareable match link and code", "Mobile scorekeeper controls", "Public read-only score API"],
       image: `${siteUrl}/shared-scores-mark.png`,
     },
   ],
