@@ -1,0 +1,14 @@
+{
+  "name": "Shared Scores",
+  "short_name": "Scores",
+  "description": "Live volleyball scorekeeping for the sideline and every remote viewer.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F3F8F2",
+  "theme_color": "#3581B8",
+  "icons": [
+    { "src": "/shared-scores-favicon.png", "sizes": "96x96", "type": "image/png" },
+    { "src": "/shared-scores-mark.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+  ]
+}
