@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DevelopersView } from "../score-app";
+import { DevelopersView } from "../components/developers-view";
 
 const description = "Read live multi-sport scores as JSON or subscribe to real-time score events with the Shared Scores public API.";
 

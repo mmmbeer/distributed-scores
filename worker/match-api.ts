@@ -1,4 +1,5 @@
 import { isSport, setsToWin, SPORTS, targetFor, type Sport } from "../lib/sports";
+import type { CompletedSet, Match, Side, TeamKey } from "../lib/match";
 
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const CODE_PATTERN = /^[A-HJ-NP-Z2-9]{6}$/;
@@ -6,20 +7,9 @@ const COLOR_PATTERN = /^#[0-9A-F]{6}$/i;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export interface MatchEnv { DB: D1Database }
-type Side = "left" | "right";
-type TeamKey = "a" | "b";
 type MatchRow = Record<string, unknown>;
-type MatchSet = { setNumber: number; teamAScore: number; teamBScore: number; winner: TeamKey };
 type ScoreSnapshot = { team: TeamKey; pointsA: number; pointsB: number; setsA: number; setsB: number; currentSet: number; status: "live" | "complete"; gamesA?: number; gamesB?: number; tiebreak?: boolean };
 type ScoreState = { gamesA?: number; gamesB?: number; tiebreak?: boolean; target?: number; history?: ScoreSnapshot[] };
-type PublicMatch = {
-  code: string; sport: Sport;
-  teamA: { name: string; color: string; points: number; sets: number };
-  teamB: { name: string; color: string; points: number; sets: number };
-  leftTeamKey: TeamKey; bestOf: number; setsToWin: number; currentSet: number; currentTarget: number;
-  status: "live" | "complete"; version: number; updatedAt: string; expiresAt: string; sets: MatchSet[];
-  state: Omit<ScoreState, "history">;
-};
 type StreamClient = { controller: ReadableStreamDefaultController<Uint8Array>; encoder: TextEncoder };
 type MatchHub = { clients: Set<StreamClient>; lastVersion: number; timer: ReturnType<typeof setInterval> | null; env: MatchEnv };
 
@@ -71,7 +61,7 @@ function randomString(length: number, alphabet: string) { const bytes = crypto.g
 function randomToken() { const bytes = crypto.getRandomValues(new Uint8Array(24)); let binary = ""; for (const byte of bytes) binary += String.fromCharCode(byte); return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
 async function sha256(value: string) { const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)); return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join(""); }
 
-function normalizeMatch(row: MatchRow, sets: MatchSet[]): PublicMatch {
+function normalizeMatch(row: MatchRow, sets: CompletedSet[]): Match {
   const sport = isSport(row.sport) ? row.sport : "volleyball";
   const bestOf = toInt(row.best_of) || SPORTS[sport].formatOptions[0].value;
   const currentSet = toInt(row.current_set) || 1;
@@ -86,14 +76,14 @@ function normalizeMatch(row: MatchRow, sets: MatchSet[]): PublicMatch {
   };
 }
 async function loadRow(env: MatchEnv, code: string) { return env.DB.prepare("SELECT * FROM matches WHERE code = ? AND expires_at > ?").bind(code, new Date().toISOString()).first<MatchRow>(); }
-async function loadMatch(env: MatchEnv, code: string): Promise<PublicMatch | null> {
+async function loadMatch(env: MatchEnv, code: string): Promise<Match | null> {
   const row = await loadRow(env, code); if (!row) return null;
   const result = await env.DB.prepare("SELECT set_number, team_a_score, team_b_score, winner FROM match_sets WHERE match_code = ? ORDER BY set_number").bind(code).all<Record<string, unknown>>();
   return normalizeMatch(row, result.results.map((set) => ({ setNumber: toInt(set.set_number), teamAScore: toInt(set.team_a_score), teamBScore: toInt(set.team_b_score), winner: set.winner === "b" ? "b" : "a" })));
 }
 
 function writeEvent(client: StreamClient, event: string, data: unknown) { client.controller.enqueue(client.encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)); }
-function broadcast(match: PublicMatch) { const hub = hubs.get(match.code); if (!hub) return; hub.lastVersion = match.version; for (const client of [...hub.clients]) { try { writeEvent(client, "score", { match }); } catch { hub.clients.delete(client); } } }
+function broadcast(match: Match) { const hub = hubs.get(match.code); if (!hub) return; hub.lastVersion = match.version; for (const client of [...hub.clients]) { try { writeEvent(client, "score", { match }); } catch { hub.clients.delete(client); } } }
 function stopEmptyHub(code: string, hub: MatchHub) { if (hub.clients.size) return; if (hub.timer) clearInterval(hub.timer); hubs.delete(code); }
 function getHub(code: string, env: MatchEnv) {
   let hub = hubs.get(code); if (hub) return hub; hub = { clients: new Set(), lastVersion: 0, timer: null, env };
@@ -128,13 +118,13 @@ async function createMatch(request: Request, env: MatchEnv) {
   await env.DB.batch(statements); return json({ match: await loadMatch(env, code), scorekeeperToken: token }, 201, { "Cache-Control": "no-store" });
 }
 
-async function loadRecentMatches(env: MatchEnv) { const result = await env.DB.prepare(`SELECT m.code FROM matches m INNER JOIN public_match_listings p ON p.match_code = m.code WHERE m.expires_at > ? ORDER BY m.updated_at DESC LIMIT 10`).bind(new Date().toISOString()).all<{ code: string }>(); const matches = await Promise.all(result.results.map((row) => loadMatch(env, row.code))); return matches.filter((match): match is PublicMatch => Boolean(match)); }
+async function loadRecentMatches(env: MatchEnv) { const result = await env.DB.prepare(`SELECT m.code FROM matches m INNER JOIN public_match_listings p ON p.match_code = m.code WHERE m.expires_at > ? ORDER BY m.updated_at DESC LIMIT 10`).bind(new Date().toISOString()).all<{ code: string }>(); const matches = await Promise.all(result.results.map((row) => loadMatch(env, row.code))); return matches.filter((match): match is Match => Boolean(match)); }
 async function authorize(request: Request, env: MatchEnv, code: string) { const authorization = request.headers.get("authorization") || ""; const token = authorization.startsWith("Bearer ") ? authorization.slice(7) : ""; if (!token || token.length > 100) throw new ApiError(401, "A scorekeeper key is required"); const row = await env.DB.prepare("SELECT edit_token_hash FROM matches WHERE code = ? AND expires_at > ?").bind(code, new Date().toISOString()).first<{ edit_token_hash: string }>(); if (!row || (await sha256(token)) !== row.edit_token_hash) throw new ApiError(403, "This scorekeeper key is not valid"); }
-function sideToTeam(match: PublicMatch, side: Side): TeamKey { return side === "left" ? match.leftTeamKey : match.leftTeamKey === "a" ? "b" : "a"; }
-function validSetWinner(match: PublicMatch, winner: TeamKey) { const winnerPoints = winner === "a" ? match.teamA.points : match.teamB.points; const loserPoints = winner === "a" ? match.teamB.points : match.teamA.points; if (match.sport === "badminton") return (winnerPoints >= 21 && winnerPoints - loserPoints >= 2) || winnerPoints === 30; return winnerPoints >= match.currentTarget && winnerPoints - loserPoints >= 2; }
+function sideToTeam(match: Match, side: Side): TeamKey { return side === "left" ? match.leftTeamKey : match.leftTeamKey === "a" ? "b" : "a"; }
+function validSetWinner(match: Match, winner: TeamKey) { const winnerPoints = winner === "a" ? match.teamA.points : match.teamB.points; const loserPoints = winner === "a" ? match.teamB.points : match.teamA.points; if (match.sport === "badminton") return (winnerPoints >= 21 && winnerPoints - loserPoints >= 2) || winnerPoints === 30; return winnerPoints >= match.currentTarget && winnerPoints - loserPoints >= 2; }
 function winnerOf(a: number, b: number): TeamKey { return a >= b ? "a" : "b"; }
 
-function tennisNext(current: PublicMatch, rawState: ScoreState, team: TeamKey) {
+function tennisNext(current: Match, rawState: ScoreState, team: TeamKey) {
   let pointsA = current.teamA.points; let pointsB = current.teamB.points; let setsA = current.teamA.sets; let setsB = current.teamB.sets; let currentSet = current.currentSet; let status = current.status;
   let gamesA = toInt(rawState.gamesA); let gamesB = toInt(rawState.gamesB); let tiebreak = Boolean(rawState.tiebreak); const history = [...(rawState.history || [])].slice(-79);
   history.push({ team, pointsA, pointsB, setsA, setsB, currentSet, status, gamesA, gamesB, tiebreak }); const setRows: { number: number; a: number; b: number; winner: TeamKey }[] = [];
