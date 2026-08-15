@@ -3,7 +3,7 @@
 import { FormEvent, PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { segmentLabel, SPORT_IDS, SPORTS, tennisPointLabel, type Sport } from "../lib/sports";
+import { isSport, segmentLabel, SPORT_IDS, SPORTS, tennisPointLabel, type Sport } from "../lib/sports";
 
 type TeamKey = "a" | "b";
 type Side = "left" | "right";
@@ -176,7 +176,7 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
     <main className="landing-shell">
       <header className="landing-header">
         <Brand />
-        <nav><a href="#watch">Watch live</a><a href="#how-it-works">How it works</a><a href="/developers">Score API</a></nav>
+        <nav><a href="#watch">Watch live</a><Link href="/rules">Scoring rules</Link><Link href="/developers">Score API</Link></nav>
         <button className="nav-start" onClick={onSetup}>Start scoring <span aria-hidden="true">↗</span></button>
       </header>
 
@@ -196,7 +196,7 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
             <a href="#watch">I have a match code</a>
           </div>
           <small>No account. No install. Just the score.</small>
-          <div className="hero-sport-list" aria-label="Supported sports">Volleyball <i /> Basketball <i /> Football <i /> Tennis <i /> Baseball <i /> Hockey <i /> Soccer <i /> Pickleball <i /> Badminton</div>
+          <div className="hero-sport-list" aria-label="Supported sports">{SPORT_IDS.map((sport, index) => <span key={sport}><Link href={`/rules/${sport}`}>{SPORTS[sport].name}</Link>{index < SPORT_IDS.length - 1 && <i />}</span>)}</div>
         </div>
         <div className="hero-score" aria-label="Example live score: North Stars 23, Eagles 21">
           <div className="hero-score-status"><i /> Live <span>Set 2</span></div>
@@ -251,6 +251,11 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
         </ol>
       </section>
 
+      <section className="home-rules" aria-labelledby="home-rules-title">
+        <header><span className="section-kicker">Know the format</span><h2 id="home-rules-title">Scoring rules for every sideline.</h2><p>Check the standard format, common variants, and official sources before the first whistle.</p></header>
+        <div>{SPORT_IDS.map((sport, index) => <Link key={sport} href={`/rules/${sport}`}><span>{String(index + 1).padStart(2, "0")}</span><b>{SPORTS[sport].name}</b><i aria-hidden="true">→</i></Link>)}</div>
+      </section>
+
       <section className="sideline-story">
         <div className="sideline-photo sideline-photo-action" role="img" aria-label="Indoor volleyball match in progress">
           <a className="photo-credit" href="https://www.pexels.com/photo/people-playing-volleyball-6203521/" target="_blank" rel="noreferrer">Photo: Pavel Danilyuk / Pexels</a>
@@ -277,7 +282,7 @@ function HomeView({ onSetup, onWatch, onResume }: { onSetup: () => void; onWatch
       <footer className="landing-footer">
         <Brand compact />
         <p>Fast live scoring for courts, fields, rinks and diamonds.</p>
-        <nav><a href="#watch">Watch a match</a><a href="/developers">Score API</a></nav>
+        <nav><a href="#watch">Watch a match</a><Link href="/rules">Scoring rules</Link><Link href="/developers">Score API</Link></nav>
       </footer>
     </main>
   );
@@ -294,13 +299,13 @@ function ColorPicker({ value, onChange, label }: { value: string; onChange: (val
   );
 }
 
-function SetupModal({ onCancel, onCreated }: { onCancel: () => void; onCreated: (code: string) => void }) {
-  const [sport, setSport] = useState<Sport>("volleyball");
-  const [teamAName, setTeamAName] = useState("Home");
-  const [teamBName, setTeamBName] = useState("Visitors");
+function SetupModal({ initialSport = "volleyball", onCancel, onCreated }: { initialSport?: Sport; onCancel: () => void; onCreated: (code: string) => void }) {
+  const [sport, setSport] = useState<Sport>(initialSport);
+  const [teamAName, setTeamAName] = useState(SPORTS[initialSport].sideNoun === "Player" ? "Player one" : "Home");
+  const [teamBName, setTeamBName] = useState(SPORTS[initialSport].sideNoun === "Player" ? "Player two" : "Visitors");
   const [teamAColor, setTeamAColor] = useState(COLORS[0]);
   const [teamBColor, setTeamBColor] = useState(COLORS[1]);
-  const [bestOf, setBestOf] = useState(3);
+  const [bestOf, setBestOf] = useState(SPORTS[initialSport].formatOptions[0].value);
   const [target, setTarget] = useState(11);
   const [showOnHome, setShowOnHome] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -969,11 +974,20 @@ source.addEventListener("score", (event) => {
 export default function ScoreApp() {
   const [route, setRoute] = useState<{ mode: ViewMode; code: string }>({ mode: "home", code: "" });
   const [setupOpen, setSetupOpen] = useState(false);
+  const [setupSport, setSetupSport] = useState<Sport>("volleyball");
   useEffect(() => {
     const syncRoute = () => {
       const next = routeFromLocation();
       if (next.mode !== "keep" && document.fullscreenElement) void document.exitFullscreen?.().catch(() => undefined);
       setRoute(next);
+      if (next.mode === "home") {
+        const params = new URLSearchParams(window.location.search);
+        const requestedSport = params.get("sport");
+        if (params.get("setup") === "1" && isSport(requestedSport)) {
+          setSetupSport(requestedSport);
+          setSetupOpen(true);
+        }
+      }
     };
     const timer = window.setTimeout(syncRoute, 0);
     window.addEventListener("popstate", syncRoute);
@@ -985,11 +999,21 @@ export default function ScoreApp() {
     if (mode !== "keep" && document.fullscreenElement) void document.exitFullscreen?.().catch(() => undefined);
     setRoute({ mode, code });
   };
+  const openSetup = (sport: Sport = "volleyball") => {
+    setSetupSport(sport);
+    setSetupOpen(true);
+  };
+  const closeSetup = () => {
+    setSetupOpen(false);
+    if (window.location.pathname === "/" && new URLSearchParams(window.location.search).get("setup") === "1") {
+      window.history.replaceState({}, "", "/");
+    }
+  };
   if (route.mode === "watch") return <WatchView code={route.code} />;
   if (route.mode === "keep") return <KeepView code={route.code} onHome={() => navigate("home")} />;
   if (route.mode === "developers") return <DevelopersView />;
   return <>
-    <HomeView onSetup={() => setSetupOpen(true)} onWatch={(code) => navigate("watch", code)} onResume={(code, token) => { sessionStorage.setItem(`scorekeeper:${code}`, token); navigate("keep", code); }} />
-    {setupOpen && <SetupModal onCancel={() => setSetupOpen(false)} onCreated={(code) => { setSetupOpen(false); navigate("keep", code); }} />}
+    <HomeView onSetup={() => openSetup()} onWatch={(code) => navigate("watch", code)} onResume={(code, token) => { sessionStorage.setItem(`scorekeeper:${code}`, token); navigate("keep", code); }} />
+    {setupOpen && <SetupModal key={setupSport} initialSport={setupSport} onCancel={closeSetup} onCreated={(code) => { setSetupOpen(false); navigate("keep", code); }} />}
   </>;
 }
