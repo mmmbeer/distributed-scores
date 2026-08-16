@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 :root {
   --ink: #17201f;
   --muted: #697371;
@@ -70,7 +69,10 @@ a { color: inherit; text-decoration: none; }
 .arena-actions > a { border-bottom: 2px solid rgba(255,255,255,.72); padding: 8px 0 5px; font-family: var(--font-barlow-condensed), Impact, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .arena-copy > small { margin-top: 19px; color: rgba(255,255,255,.62); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .hero-sport-list { display: flex; max-width: 560px; flex-wrap: wrap; align-items: center; gap: 5px 9px; margin-top: 14px; color: rgba(255,255,255,.58); font-family: var(--font-barlow-condensed), Impact, sans-serif; font-size: 9px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
-.hero-sport-list i { width: 3px; height: 3px; border-radius: 50%; background: var(--sandy); }
+.hero-sport-list > span { display: inline-flex; align-items: center; gap: 9px; }
+.hero-sport-list a { transition: color .15s ease; }
+.hero-sport-list a:hover { color: white; }
+.hero-sport-list i { display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: var(--sandy); }
 .sport-button { display: inline-flex; min-height: 55px; align-items: center; justify-content: center; gap: 24px; border: 0; padding: 0 22px; cursor: pointer; font-family: var(--font-barlow-condensed), Impact, sans-serif; font-size: 16px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; transition: transform .16s ease, background .16s ease; }
 .sport-button:hover { transform: translateY(-3px); }
 .sport-button-primary { background: var(--sandy); color: var(--sport-ink); box-shadow: 5px 5px 0 var(--sport-ink); }
@@ -190,7 +192,7 @@ a { color: inherit; text-decoration: none; }
 .team-setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .sport-picker { margin: 0 0 22px; border: 0; padding: 0; }
 .sport-picker legend, .target-picker legend { margin-bottom: 10px; font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-.sport-picker > div { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+.sport-picker-groups { display: grid; gap: 13px; } .sport-picker-groups > section > h3 { margin: 0 0 6px; color: #5a6e79; font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; } .sport-picker-groups > section > div { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
 .sport-picker button { display: grid; min-width: 0; place-items: center; gap: 4px; border: 1px solid #cdd3cf; padding: 10px 5px; background: rgba(255,255,255,.5); color: var(--sport-ink); cursor: pointer; font-family: var(--font-barlow-condensed), Impact, sans-serif; text-transform: uppercase; }
 .sport-picker button span { display: grid; width: 28px; height: 22px; place-items: center; background: var(--linen); color: var(--steel); font-size: 9px; letter-spacing: .08em; }
 .sport-picker button b { overflow: hidden; max-width: 100%; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
@@ -437,7 +439,7 @@ a { color: inherit; text-decoration: none; }
   .setup-modal-intro h1 { font-size: 45px; }
   .setup-modal-intro p { margin-top: 9px; }
   .team-setup-grid { grid-template-columns: 1fr; }
-  .sport-picker > div { grid-template-columns: repeat(3, 1fr); }
+  .sport-picker-groups > section > div { grid-template-columns: repeat(3, 1fr); }
   .team-setup-grid > section { padding: 17px; }
   .team-label { margin-bottom: 12px; }
   .color-picker { margin-top: 16px; }
