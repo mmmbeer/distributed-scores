@@ -1,19 +1,19 @@
 "use client";
 
 import { FormEvent, useRef, useState } from "react";
-import { SPORT_IDS, SPORTS, type Sport } from "../../lib/sports";
+import { SPORT_GROUPS, SPORTS, type Sport } from "../../lib/sports";
 import type { Match } from "../../lib/match";
 import { matchApi, saveScorekeeperSession } from "../match-client";
 import { Modal } from "./modal";
 import { COLORS, ColorPicker } from "./ui";
 
-export function SetupModal({ onCancel, onCreated }: { onCancel: () => void; onCreated: (code: string) => void }) {
-  const [sport, setSport] = useState<Sport>("volleyball");
-  const [teamAName, setTeamAName] = useState("Home");
-  const [teamBName, setTeamBName] = useState("Visitors");
+export function SetupModal({ initialSport = "volleyball", onCancel, onCreated }: { initialSport?: Sport; onCancel: () => void; onCreated: (code: string) => void }) {
+  const [sport, setSport] = useState<Sport>(initialSport);
+  const [teamAName, setTeamAName] = useState(SPORTS[initialSport].sideNoun === "Player" ? "Player one" : "Home");
+  const [teamBName, setTeamBName] = useState(SPORTS[initialSport].sideNoun === "Player" ? "Player two" : "Visitors");
   const [teamAColor, setTeamAColor] = useState(COLORS[0]);
   const [teamBColor, setTeamBColor] = useState(COLORS[1]);
-  const [bestOf, setBestOf] = useState(3);
+  const [bestOf, setBestOf] = useState(SPORTS[initialSport].formatOptions[0].value);
   const [target, setTarget] = useState(11);
   const [showOnHome, setShowOnHome] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -74,22 +74,27 @@ export function SetupModal({ onCancel, onCreated }: { onCancel: () => void; onCr
       </div>
       <fieldset className="sport-picker">
         <legend>Sport</legend>
-        <div>{SPORT_IDS.map((id) => (
-          <button key={id} type="button" className={sport === id ? "selected" : ""} aria-pressed={sport === id} onClick={() => selectSport(id)}>
-            <span>{SPORTS[id].icon}</span><b>{SPORTS[id].name}</b>
-          </button>
+        <div className="sport-picker-groups">{SPORT_GROUPS.map((group) => (
+          <section key={group.name} aria-labelledby={`sport-group-${group.name.replaceAll(" ", "-")}`}>
+            <h3 id={`sport-group-${group.name.replaceAll(" ", "-")}`}>{group.name}</h3>
+            <div>{group.sports.map((id) => (
+              <button key={id} type="button" className={sport === id ? "selected" : ""} aria-pressed={sport === id} onClick={() => selectSport(id)}>
+                <span>{SPORTS[id].icon}</span><b>{SPORTS[id].name}</b>
+              </button>
+            ))}</div>
+          </section>
         ))}</div>
       </fieldset>
       <div className="team-setup-grid">
         <section style={{ "--team-color": teamAColor } as React.CSSProperties}>
           <span className="team-label">{SPORTS[sport].sideNoun} one</span>
           <label>{SPORTS[sport].sideNoun} name<input ref={firstInputRef} value={teamAName} onChange={(event) => setTeamAName(event.target.value)} maxLength={50} required /></label>
-          <ColorPicker value={teamAColor} onChange={setTeamAColor} label="Team color" />
+          <ColorPicker value={teamAColor} onChange={setTeamAColor} label={`${SPORTS[sport].sideNoun} color`} />
         </section>
         <section style={{ "--team-color": teamBColor } as React.CSSProperties}>
           <span className="team-label">{SPORTS[sport].sideNoun} two</span>
           <label>{SPORTS[sport].sideNoun} name<input value={teamBName} onChange={(event) => setTeamBName(event.target.value)} maxLength={50} required /></label>
-          <ColorPicker value={teamBColor} onChange={setTeamBColor} label="Team color" />
+          <ColorPicker value={teamBColor} onChange={setTeamBColor} label={`${SPORTS[sport].sideNoun} color`} />
         </section>
       </div>
       <fieldset className="format-picker">
