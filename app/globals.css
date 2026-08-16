@@ -193,7 +193,7 @@ a { color: inherit; text-decoration: none; }
 .sport-picker { margin: 0 0 16px; border: 0; padding: 0; }
 .sport-picker legend, .target-picker legend { margin-bottom: 7px; font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .sport-picker-groups { display: grid; gap: 9px; } .sport-picker-groups > section > h3 { margin: 0 0 4px; color: #5a6e79; font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; } .sport-picker-groups > section > div { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
-.sport-picker button { display: grid; min-width: 0; place-items: center; gap: 2px; border: 1px solid #cdd3cf; padding: 5px 4px; background: rgba(255,255,255,.5); color: var(--sport-ink); cursor: pointer; font-family: var(--font-barlow-condensed), Impact, sans-serif; line-height: 1; text-transform: uppercase; }
+.sport-picker button { display: flex; min-width: 0; min-height: 34px; align-items: center; justify-content: center; gap: 7px; border: 1px solid #cdd3cf; padding: 5px 6px; background: rgba(255,255,255,.5); color: var(--sport-ink); cursor: pointer; font-family: var(--font-barlow-condensed), Impact, sans-serif; line-height: 1; text-transform: uppercase; }
 .sport-picker button span { display: grid; width: 24px; height: 18px; place-items: center; background: var(--linen); color: var(--steel); font-size: 8px; letter-spacing: .08em; }
 .sport-picker button b { overflow: hidden; max-width: 100%; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .sport-picker button.selected { border-color: var(--sport-ink); background: var(--sandy); box-shadow: inset 0 -3px 0 var(--sport-ink); }
