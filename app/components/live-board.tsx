@@ -1,7 +1,7 @@
 "use client";
 
 import { PointerEvent as ReactPointerEvent, useRef } from "react";
-import { segmentLabel, SPORTS } from "../../lib/sports";
+import { segmentLabel, setUnitName, SPORTS } from "../../lib/sports";
 import {
   displayScore,
   getSides,
@@ -15,12 +15,13 @@ export type ScoreGesture = "point" | "set";
 export type GestureFeedback = { id: number; side: Side; text: string } | null;
 
 export function SetHistory({ match }: { match: Match }) {
+  const unit = SPORTS[match.sport].unit === "set" ? setUnitName(match.sport) : SPORTS[match.sport].unit;
   if (!match.sets.length) {
-    return <span className="no-sets">No completed {SPORTS[match.sport].unit}s</span>;
+    return <span className="no-sets">No completed {unit}s</span>;
   }
   return <div className="set-history">{match.sets.map((set) => (
     <span key={set.setNumber}>
-      <small>{SPORTS[match.sport].unit.slice(0, 1).toUpperCase()}{set.setNumber}</small>
+      <small>{unit.slice(0, 1).toUpperCase()}{set.setNumber}</small>
       <b>{set.teamAScore}</b><i>–</i><b>{set.teamBScore}</b>
     </span>
   ))}</div>;
@@ -102,7 +103,7 @@ export function LiveBoard({
             onClick={(event) => { event.stopPropagation(); onGesture?.(side, "point", amount); }}
           >+{amount}</button>
         ))}</div>}
-        {scorekeeper && <div className="gesture-cues" aria-hidden="true"><span>↑ + score</span><span>tap +1</span><span>win − / + →</span></div>}
+        {scorekeeper && <div className="gesture-cues" aria-hidden="true"><span>↑ + score</span><span>tap +1</span>{SPORTS[match.sport].unit === "set" && match.sport !== "tennis" && <span>win − / + →</span>}</div>}
         {feedback?.side === side && <span key={feedback.id} className="gesture-feedback" aria-live="polite">{feedback.text}</span>}
       </section>
     );
