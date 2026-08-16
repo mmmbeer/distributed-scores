@@ -9,10 +9,18 @@ Shared Scores is a mobile-first live scorekeeping app for two-sided sideline spo
 - Football: 4 quarters; 1, 2, 3, and 6 point actions
 - Tennis: best of 3 or 5; automatic points, games, deuce, advantage, tiebreaks, and sets
 - Baseball: 7 or 9 innings
-- Hockey: 3 periods
+- Ice hockey: 3 periods
 - Soccer: 2 halves
 - Pickleball: best of 3 or 5; games to 11, 15, or 21; win by 2
 - Badminton: best of 3; games to 21; win by 2 with a 30-point cap
+- Table tennis: best of 3, 5, or 7; games to 11; win by 2
+- Squash: best of 3 or 5; games to 11; win by 2
+- Softball: 5 or 7 innings
+- Lacrosse: 4 quarters
+- Rugby: 2 halves; 2, 3, 5, and 7 point actions
+- Handball: 2 halves
+- Water polo: 4 periods
+- Field hockey: 4 quarters
 
 ## Scorekeeper controls
 
