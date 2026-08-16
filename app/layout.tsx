@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Condensed, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./styles/rules.css";
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -21,7 +22,7 @@ const geistMono = Geist_Mono({
 
 const siteUrl = "https://scores.fairway3games.com";
 const title = "Shared Scores | Live Sideline Scorekeeping";
-const description = "Keep score courtside and share a live scoreboard for volleyball, basketball, football, tennis, baseball, hockey, soccer, pickleball, and badminton.";
+const description = "Keep score courtside and share a live scoreboard across 17 sports, from volleyball and basketball to rugby, softball, table tennis, and water polo.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
   description,
   applicationName: "Shared Scores",
   category: "sports",
-  keywords: ["live sports scores", "scorekeeping app", "live scoreboard", "share scores", "volleyball scoring", "basketball scoring", "tennis scoring"],
+  keywords: ["live sports scores", "scorekeeping app", "live scoreboard", "share scores", "volleyball scoring", "basketball scoring", "tennis scoring", "rugby scoring", "softball scoring"],
   alternates: { canonical: "/" },
   robots: {
     index: true,
