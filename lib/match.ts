@@ -1,4 +1,4 @@
-import { segmentLabel, SPORTS, tennisPointLabel, type Sport } from "./sports";
+import { segmentLabel, setUnitName, SPORTS, tennisPointLabel, type Sport } from "./sports";
 
 export type TeamKey = "a" | "b";
 export type Side = "left" | "right";
@@ -69,7 +69,8 @@ export function secondaryScore(match: Match, key: TeamKey) {
     return `${games} games · ${team.sets} sets`;
   }
   if (SPORTS[match.sport].unit === "set") {
-    return `${team.sets} ${team.sets === 1 ? "set" : "sets"}`;
+    const unit = setUnitName(match.sport);
+    return `${team.sets} ${unit}${team.sets === 1 ? "" : "s"}`;
   }
   return segmentLabel(match.sport, match.currentSet, match.bestOf);
 }
@@ -90,8 +91,11 @@ export function matchStatusLine(match: Match) {
 }
 
 export function winnerReady(match: Match): TeamKey | null {
-  if (!["volleyball", "pickleball", "badminton"].includes(match.sport)) return null;
+  if (SPORTS[match.sport].unit !== "set" || match.sport === "tennis") return null;
   const difference = match.teamA.points - match.teamB.points;
+  if (match.sport === "badminton" && Math.max(match.teamA.points, match.teamB.points) === 30) {
+    return difference > 0 ? "a" : "b";
+  }
   if (match.teamA.points >= match.currentTarget && difference >= 2) return "a";
   if (match.teamB.points >= match.currentTarget && difference <= -2) return "b";
   return null;
