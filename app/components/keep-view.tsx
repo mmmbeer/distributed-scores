@@ -154,7 +154,7 @@ export function KeepView({ code, onHome }: { code: string; onHome: () => void })
     if (kind === "point") {
       point(side, amount);
       showGestureFeedback(side, amount > 0 ? `+${amount}` : "UNDO");
-    } else {
+    } else if (SPORTS[match.sport].unit === "set" && match.sport !== "tennis") {
       setWin(side, amount);
       showGestureFeedback(side, amount > 0 ? "WIN +1" : "WIN −1");
     }
@@ -189,7 +189,7 @@ export function KeepView({ code, onHome }: { code: string; onHome: () => void })
 
   const ready = winnerReady(match);
   const readyName = ready === "a" ? match.teamA.name : ready === "b" ? match.teamB.name : "";
-  const setScoring = ["volleyball", "pickleball", "badminton"].includes(match.sport);
+  const setScoring = SPORTS[match.sport].unit === "set" && match.sport !== "tennis";
   const automatic = match.sport === "tennis";
   const advanceLabel = match.currentSet >= match.bestOf ? "Finish game" : `End ${segmentLabel(match.sport, match.currentSet, match.bestOf)}`;
 
